@@ -132,13 +132,13 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl divGen;
 
         /// <summary>
-        /// Button4 control.
+        /// BtnGenerar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button4;
+        protected global::System.Web.UI.WebControls.Button BtnGenerar;
 
         /// <summary>
         /// divApl control.
@@ -159,13 +159,13 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.Button btAlicarPlanilla;
 
         /// <summary>
-        /// Button8 control.
+        /// BtnConsultar1 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button8;
+        protected global::System.Web.UI.WebControls.Button BtnConsultar1;
 
         /// <summary>
         /// panelID control.
@@ -177,13 +177,13 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.Panel panelID;
 
         /// <summary>
-        /// CheckBox1 control.
+        /// ChkCargarProtecciones control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox CheckBox1;
+        protected global::System.Web.UI.WebControls.CheckBox ChkCargarProtecciones;
 
         /// <summary>
         /// divFile control.
@@ -213,13 +213,13 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.FileUpload fileProtectedDz;
 
         /// <summary>
-        /// Button6 control.
+        /// BtnProcesar control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button6;
+        protected global::System.Web.UI.WebControls.Button BtnProcesar;
 
         /// <summary>
         /// divGrid control.
@@ -240,40 +240,40 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.GridView gvINGDD;
 
         /// <summary>
-        /// Button1 control.
+        /// BtnDetalleModulos control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button1;
+        protected global::System.Web.UI.WebControls.Button BtnDetalleModulos;
 
         /// <summary>
-        /// Button2 control.
+        /// BtnDetalleEmpleados control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button2;
+        protected global::System.Web.UI.WebControls.Button BtnDetalleEmpleados;
 
         /// <summary>
-        /// Button3 control.
+        /// BtnIncentivoTotal control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button3;
+        protected global::System.Web.UI.WebControls.Button BtnIncentivoTotal;
 
         /// <summary>
-        /// Button7 control.
+        /// BtnPendPago control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button7;
+        protected global::System.Web.UI.WebControls.Button BtnPendPago;
 
         /// <summary>
         /// divrpt control.
@@ -294,13 +294,13 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.DropDownList ddlReporteria;
 
         /// <summary>
-        /// Button9 control.
+        /// BtnPrint control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button9;
+        protected global::System.Web.UI.WebControls.Button BtnPrint;
 
         /// <summary>
         /// div5 control.
@@ -330,13 +330,13 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.TextBox TxtCodigo;
 
         /// <summary>
-        /// Button5 control.
+        /// BtnConsultar2 control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Button Button5;
+        protected global::System.Web.UI.WebControls.Button BtnConsultar2;
 
         /// <summary>
         /// div1 control.

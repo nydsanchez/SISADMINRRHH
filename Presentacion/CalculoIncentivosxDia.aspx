@@ -56,20 +56,20 @@
 
                 
                     <div class="col-md-3" runat="server" id="divGen" visible="false">
-                       <asp:Button ID="Button4" Class="btn btn-success" runat="server" Text="Generar" OnClick="Button4_Click" />
+                       <asp:Button ID="BtnGenerar" Class="btn btn-success" runat="server" Text="Generar" OnClick="BtnGenerar_Click" />
                     </div>
                     <div class="col-md-3" runat="server" id="divApl" visible="false">
                         <asp:Button ID="btAlicarPlanilla" Class="btn btn-success" runat="server" Text="Aplicar" OnClick="btAlicarPlanilla_Click" />
                     </div>
                         <div class="col-md-3">
-                        <asp:Button ID="Button8" Class="btn btn-success" runat="server" Text="Consultar" OnClick="Button8_Click" />
+                        <asp:Button ID="BtnConsultar1" Class="btn btn-success" runat="server" Text="Consultar" OnClick="BtnConsultar1_Click" />
                     </div>
                 </div>
 
                 <asp:Panel ID="panelID" runat="server" Visible="false">
                     <div class="row">
                         <div class="col-md-12">
-                            <asp:CheckBox ID="CheckBox1" runat="server" AutoPostBack="True" Text="Cargar Protecciones" OnCheckedChanged="CheckBox1_CheckedChanged" />
+                            <asp:CheckBox ID="ChkCargarProtecciones" runat="server" AutoPostBack="True" Text="Cargar Protecciones" OnCheckedChanged="ChkCargarProtecciones_CheckedChanged" />
 
                         </div>
                         <div class="col-md-12" runat="server" id="divFile" visible="false">
@@ -78,7 +78,7 @@
                                 <asp:FileUpload ID="fileProtectedDz" runat="server" />
                             </div>
                             <div class="col-md-2">
-                                <asp:Button ID="Button6" Class="btn btn-success" runat="server" Text="Procesar" OnClick="Button6_Click" />
+                                <asp:Button ID="BtnProcesar" Class="btn btn-success" runat="server" Text="Procesar" OnClick="BtnProcesar_Click" />
                             </div>
 
 
@@ -118,22 +118,22 @@
 
                     <div class="col-md-3">
                         <div class="col-md-3 col-sm-3 col-xs-5">
-                            <asp:Button ID="Button1" Class="btn btn-success" runat="server" Text="Detalle Modulos" OnClick="Button1_Click" Visible="false" />
+                            <asp:Button ID="BtnDetalleModulos" Class="btn btn-success" runat="server" Text="Detalle Modulos" OnClick="BtnDetalleModulos_Click" Visible="false" />
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="col-md-3 col-sm-3 col-xs-5">
-                            <asp:Button ID="Button2" Class="btn btn-success" runat="server" Text="Detalle Empleado" OnClick="Button2_Click" Visible="false" />
+                            <asp:Button ID="BtnDetalleEmpleados" Class="btn btn-success" runat="server" Text="Detalle Empleado" OnClick="BtnDetalleEmpleados_Click" Visible="false" />
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="col-md-3 col-sm-3 col-xs-5">
-                            <asp:Button ID="Button3" Class="btn btn-success" runat="server" Text="Incentivo Total" OnClick="Button3_Click" Visible="false" />
+                            <asp:Button ID="BtnIncentivoTotal" Class="btn btn-success" runat="server" Text="Incentivo Total" OnClick="BtnIncentivoTotal_Click" Visible="false" />
                         </div>
                     </div>
                     <div class="col-md-3">
                         <div class="col-md-3 col-sm-3 col-xs-5">
-                            <asp:Button ID="Button7" Class="btn btn-success" runat="server" Text="Pendiente Pago" OnClick="Button7_Click" Visible="false" />
+                            <asp:Button ID="BtnPendPago" Class="btn btn-success" runat="server" Text="Pendiente Pago" OnClick="BtnPendPago_Click" Visible="false" />
                         </div>
                     </div>
 
@@ -158,7 +158,7 @@
                             </asp:DropDownList>
                         </div>
                         <div class="col-md-2">
-                            <asp:Button ID="Button9" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Imprimir" OnClick="Button9_Click" />
+                            <asp:Button ID="BtnPrint" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Imprimir" OnClick="BtnPrint_Click" />
                         </div>
 
 
@@ -174,7 +174,7 @@
                         </div>
                         <div class="col-md-3" style="margin-top: 23px;">
                             <div class="col-md-3 col-sm-3 col-xs-5">
-                                <asp:Button ID="Button5" Class="btn btn-success" runat="server" Text="Consultar" OnClick="Button5_Click" />
+                                <asp:Button ID="BtnConsultar2" Class="btn btn-success" runat="server" Text="Consultar" OnClick="BtnConsultar2_Click" />
                             </div>
                         </div>
                     </div>
