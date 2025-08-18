@@ -1,0 +1,6 @@
+Fecha: 17/11/2024 17:46:30
+Mensaje: Referencia a objeto no establecida como instancia de un objeto.
+StackTrace:    en Negocios.Neg_Catalogos.CargarPaises() en C:\K2024\NominaRRHH\Negocios\Neg_Catalogos.cs:línea 29
+   en NominaRRHH.Presentacion.Empleados.ObtenerPaises() en C:\K2024\NominaRRHH\NominaRRHH\Presentacion\Empleados.aspx.cs:línea 277
+   en NominaRRHH.Presentacion.Empleados.Page_Load(Object sender, EventArgs e) en C:\K2024\NominaRRHH\NominaRRHH\Presentacion\Empleados.aspx.cs:línea 37
+--------------------------------------------------

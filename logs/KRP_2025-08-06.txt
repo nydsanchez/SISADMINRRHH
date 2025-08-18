@@ -1,0 +1,3 @@
+2025-08-06 16:16:56.8031 Info Aplicación iniciada.
+2025-08-06 16:19:37.3743 Info Session Iniciada por Usuario: itsupport
+2025-08-06 16:21:02.7927 Info Session Iniciada por Usuario: itsupport

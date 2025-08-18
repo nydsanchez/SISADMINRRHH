@@ -1,0 +1,15 @@
+2025-01-13 06:49:45.3204 Info Aplicación iniciada.
+2025-01-13 06:52:40.9350 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:53:01.6811 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:53:19.3930 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:54:00.9454 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:57:18.6076 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:57:21.9516 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:57:38.1956 Info Session Iniciada por Usuario: rrhh
+2025-01-13 06:59:25.1595 Info Session Iniciada por Usuario: dmorales
+2025-01-13 06:59:47.6365 Info Session Iniciada por Usuario: dmorales
+2025-01-13 07:01:24.8574 Info Session Iniciada por Usuario: vporras
+2025-01-13 07:01:37.9013 Info Session Iniciada por Usuario: vporras
+2025-01-13 07:03:49.5882 Info Aplicación iniciada.
+2025-01-13 07:04:01.2760 Info Session Iniciada por Usuario: vporras
+2025-01-13 07:04:06.4011 Info Session Iniciada por Usuario: aporras

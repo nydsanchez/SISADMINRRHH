@@ -1,0 +1,24 @@
+2025-01-12 06:54:20.6221 Info Aplicación iniciada.
+2025-01-12 06:54:45.2339 Info Session Iniciada por Usuario: vporras
+2025-01-12 06:54:51.5935 Info Session Iniciada por Usuario: vporras
+2025-01-12 06:54:57.3497 Info Session Iniciada por Usuario: vporras
+2025-01-12 06:55:08.7687 Error Ocurrió un error en GenerarComprobantePeriodoCR
+2025-01-12 06:56:02.7359 Info Session Iniciada por Usuario: vporras
+2025-01-12 06:56:09.2048 Error Ocurrió un error en GenerarComprobantePeriodoCR
+2025-01-12 06:57:07.6873 Info Session Iniciada por Usuario: vporras
+2025-01-12 06:57:17.7501 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:05:23.9949 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:15:23.5004 Info Aplicación iniciada.
+2025-01-12 07:16:00.3295 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:16:02.7671 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:16:14.4833 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:31:23.0696 Info Aplicación iniciada.
+2025-01-12 07:31:51.5209 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:31:53.4429 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:32:00.3603 Info Session Iniciada por Usuario: vporras
+2025-01-12 07:33:02.5934 Error Ocurrió un error en GenerarComprobantePeriodoCR
+2025-01-12 16:13:40.4954 Info Aplicación iniciada.
+2025-01-12 16:14:12.4711 Info Session Iniciada por Usuario: vporras
+2025-01-12 16:14:14.6743 Info Session Iniciada por Usuario: vporras
+2025-01-12 16:14:19.4517 Info Session Iniciada por Usuario: vporras
+2025-01-12 16:15:19.6942 Error Ocurrió un error en GenerarComprobantePeriodoCR

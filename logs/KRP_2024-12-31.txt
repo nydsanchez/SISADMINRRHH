@@ -1,0 +1,41 @@
+2024-12-31 09:18:14.1590 Info Aplicación iniciada.
+2024-12-31 09:18:20.0601 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:18:33.1096 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:18:42.8274 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:18:45.2650 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:21:24.1661 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:21:37.8840 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:21:46.6813 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:21:56.6103 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:25:36.9877 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:25:38.3316 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:25:39.7535 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:25:41.0036 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:29:47.2581 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:30:15.8412 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:30:43.3039 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:30:47.2572 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:30:57.8323 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:30:59.1917 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:50:44.4474 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:50:50.8868 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:50:55.0239 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:51:05.1931 Info Session Iniciada por Usuario: aporras
+2024-12-31 09:51:06.1462 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:26:38.2096 Info Aplicación iniciada.
+2024-12-31 10:26:54.6993 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:26:58.2275 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:27:04.7233 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:27:21.5142 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:27:25.0339 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:28:01.6753 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:28:07.3473 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:28:16.3092 Info Session Iniciada por Usuario: aporras
+2024-12-31 10:28:17.6218 Info Session Iniciada por Usuario: aporras
+2024-12-31 11:00:10.4537 Info Aplicación iniciada.
+2024-12-31 11:01:02.3053 Info Session Iniciada por Usuario: aporras
+2024-12-31 11:01:10.3999 Info Session Iniciada por Usuario: aporras
+2024-12-31 11:01:16.4469 Info Session Iniciada por Usuario: aporras
+2024-12-31 11:01:18.4939 Info Session Iniciada por Usuario: aporras
+2024-12-31 11:01:25.9165 Info Session Iniciada por Usuario: aporras
+2024-12-31 11:01:29.3229 Info Session Iniciada por Usuario: aporras

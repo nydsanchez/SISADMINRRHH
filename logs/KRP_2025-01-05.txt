@@ -1,0 +1,14 @@
+2025-01-05 13:36:58.3749 Info Aplicación iniciada.
+2025-01-05 13:42:43.0176 Info Aplicación iniciada.
+2025-01-05 13:44:14.9395 Info Session Iniciada por Usuario: vporras
+2025-01-05 13:44:21.9756 Info Session Iniciada por Usuario: vporras
+2025-01-05 13:44:25.6486 Info Session Iniciada por Usuario: vporras
+2025-01-05 13:45:08.8347 Error Ocurrió un error en GenerarComprobantePeriodoCR
+2025-01-05 13:56:33.6100 Info Aplicación iniciada.
+2025-01-05 13:56:48.8310 Info Session Iniciada por Usuario: vporras
+2025-01-05 13:56:51.6238 Info Session Iniciada por Usuario: vporras
+2025-01-05 13:56:55.0036 Info Session Iniciada por Usuario: vporras
+2025-01-05 15:39:53.2194 Info AplicaciÃ³n iniciada.
+2025-01-05 15:40:32.5278 Info Session Iniciada por Usuario: vporras
+2025-01-05 15:40:35.0629 Info Session Iniciada por Usuario: vporras
+2025-01-05 15:40:38.3946 Info Session Iniciada por Usuario: vporras

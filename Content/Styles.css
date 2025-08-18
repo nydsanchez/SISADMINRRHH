@@ -1,0 +1,156 @@
+﻿.labelTop 
+{
+    margin-top: 12px;
+}
+
+.borderCalendar
+{
+    border-style: solid;
+    border-color: #ECDBDB;
+}
+
+.btnagregarPermiso
+{
+    margin-top: 25px;
+}
+
+div.mar-top
+{
+    margin-top: 60px;
+}
+
+.encabezadoTable {
+    background-color:cadetblue;
+}
+
+.inputSearch {
+        width: 95px;
+}
+
+.btnSearch {
+        margin-top: 20px;
+        margin-left: -72px;
+}
+
+.marginChkActivo {
+   margin-top: 22px;
+}
+
+.divRadiosButtons {
+    margin-top: 10px;
+}
+
+.lblradioButtons {
+    margin-left: 58px;
+}
+.chkExtra {
+    margin-left: 90px;
+}
+.lblLiq {
+    margin-left: 30px;
+}
+
+.marginFields{
+    margin-bottom: 400px;
+}
+.sizeFoto
+{
+    background-color: white;
+    margin-left: 100px;
+    width: 150px;
+    height: 140px;
+    border-bottom: 6px double #369;
+    border-top: 6px double #369;
+    border-left: 6px double #369;
+    border-right: 6px double #369;
+
+}
+
+.paddingTab
+{
+    padding-top: 34px;
+}
+
+.paddingContentTabs
+{
+    padding-bottom: 20px;
+}
+
+/*Switch*/
+.material-switch > input[type="checkbox"] {
+    display: none;   
+}
+
+.material-switch > label {
+    cursor: pointer;
+    height: 0px;
+    position: relative; 
+    width: 40px;  
+}
+
+.material-switch > label::before {
+    background: rgb(0, 0, 0);
+    box-shadow: inset 0px 0px 10px rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    content: '';
+    height: 16px;
+    margin-top: -8px;
+    position:absolute;
+    opacity: 0.3;
+    transition: all 0.4s ease-in-out;
+    width: 40px;
+}
+.material-switch > label::after {
+    background: rgb(255, 255, 255);
+    border-radius: 16px;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.3);
+    content: '';
+    height: 24px;
+    left: -4px;
+    margin-top: -8px;
+    position: absolute;
+    top: -4px;
+    transition: all 0.3s ease-in-out;
+    width: 24px;
+}
+.material-switch > input[type="checkbox"]:checked + label::before {
+    background: inherit;
+    opacity: 0.5;
+}
+.material-switch > input[type="checkbox"]:checked + label::after {
+    background: inherit;
+    left: 20px;
+}
+
+.invi{
+    display: none;
+}
+
+.contentCatalogs{
+        margin-left: 305px;
+}
+
+.overlay
+{
+    position: fixed;
+    z-index: 98;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    background-color: #aaa;
+    filter: alpha(opacity=80);
+    opacity: 0.8;
+}
+.overlayContent
+{
+    z-index: 99;
+    margin: 250px auto;
+    width: 80px;
+    height: 80px;
+}
+
+.backgroundLogin
+{
+    background-color: #E1E2E2;
+}

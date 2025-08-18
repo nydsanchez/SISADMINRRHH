@@ -1,0 +1,81 @@
+2024-12-21 09:04:45.0742 Info Aplicación iniciada.
+2024-12-21 09:05:03.6183 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:05:07.0034 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:05:16.1901 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:07:50.3080 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:07:56.9841 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:52:28.4038 Info Aplicación iniciada.
+2024-12-21 09:53:22.8986 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:53:28.1323 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:53:33.4187 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:57:48.7003 Info Aplicación iniciada.
+2024-12-21 09:58:03.1272 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:58:10.5128 Info Session Iniciada por Usuario: vporras
+2024-12-21 09:58:14.7186 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:04:26.2598 Info Aplicación iniciada.
+2024-12-21 10:04:36.9583 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:04:44.4852 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:04:53.1349 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:09:09.0284 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:09:17.0833 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:12:50.9288 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:12:57.8217 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:13:38.6564 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:13:45.3069 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:16:56.3123 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:17:04.1626 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:19:14.2268 Info Aplicación iniciada.
+2024-12-21 10:19:29.4889 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:19:32.3769 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:19:44.9296 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:21:22.0489 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:21:31.8745 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:27:10.4451 Info Aplicación iniciada.
+2024-12-21 10:27:21.8706 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:27:25.0225 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:27:43.6415 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:32:30.1676 Info Aplicación iniciada.
+2024-12-21 10:32:42.9597 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:32:45.7061 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:32:54.6982 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:36:39.0513 Info Aplicación iniciada.
+2024-12-21 10:36:51.6368 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:36:55.1680 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:37:05.7400 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:39:14.2471 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:57:46.6725 Info Aplicación iniciada.
+2024-12-21 10:57:55.9609 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:57:59.0347 Info Session Iniciada por Usuario: vporras
+2024-12-21 10:58:07.4086 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:02:19.5704 Info Aplicación iniciada.
+2024-12-21 11:03:07.6383 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:03:12.8613 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:03:25.6034 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:17:07.5614 Info Aplicación iniciada.
+2024-12-21 11:17:17.4427 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:17:21.2294 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:17:29.9774 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:20:14.9546 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:20:22.8998 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:22:03.4107 Info Aplicación iniciada.
+2024-12-21 11:23:38.9858 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:23:42.1492 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:23:49.7724 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:25:11.2550 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:25:17.7014 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:25:38.8511 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:25:46.9619 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:26:54.4476 Info Aplicación iniciada.
+2024-12-21 11:27:05.5647 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:27:08.4669 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:27:19.5409 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:27:28.4597 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:27:41.6870 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:28:20.7500 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:28:25.5702 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:29:24.3790 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:29:31.8526 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:29:47.2445 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:29:50.4670 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:31:10.5357 Info Session Iniciada por Usuario: vporras
+2024-12-21 11:31:29.9147 Info Session Iniciada por Usuario: vporras

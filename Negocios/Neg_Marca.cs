@@ -1,0 +1,1413 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using Datos;
+using System.Data;
+using System.Web.SessionState;
+using System.Globalization;
+using System.Linq.Expressions;
+using System.Diagnostics;
+using System.Web;
+
+namespace Negocios
+{
+    public class Neg_Marca
+    {
+
+        public string spObtenerMarcas(DateTime Fecha, int idempresa)
+        {
+            IUserDetail userDetail;
+
+            if (idempresa == 0)
+            {
+                userDetail = UserDetailResolver.getUserDetail();
+                idempresa = userDetail.getIDEmpresa();
+            }
+
+            Datos.Dato_Marca datpln = new Datos.Dato_Marca();
+            string rsp = "";
+            Dato_Empleados _Empleados = new Dato_Empleados();
+
+            dsPlanilla.dtMarcasDataTable dtMarcasPln = datpln.ImportarMarcasdePlanilla(Fecha, Fecha, idempresa);
+            dsPlanilla.dtMarcasDataTable dtMarcasMar = datpln.ImportarMarcas(Fecha, idempresa);
+            dsPlanilla.dtMarcasDataTable dtMarcasAdd = new dsPlanilla.dtMarcasDataTable();
+            dsPlanilla.dtMarcasDataTable dtMarcasUpd = new dsPlanilla.dtMarcasDataTable();
+
+            dsPlanilla.dtEmpleadoDataTable dtEmpleado = _Empleados.ActivosParaPlanilla(idempresa, 5, 1);
+
+            int k = 0, i = 0;
+            int n = dtMarcasPln.Rows.Count;
+
+            for (i = 0; i < n; i++)
+            {
+                while (k < dtMarcasMar.Rows.Count && dtMarcasPln[i].codigo_empleado != dtMarcasMar[k].codigo_empleado)
+                {
+                    if (dtMarcasPln[i].codigo_empleado > dtMarcasMar[k].codigo_empleado)
+                    {
+                        if (dtMarcasMar[k].horae == dtMarcasMar[k].horas)
+                            dtMarcasMar[k].horas = TimeSpan.Zero;
+
+                        dtMarcasAdd.ImportRow(dtMarcasMar[k]);
+                        k++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }
+
+                if (k < dtMarcasMar.Rows.Count && dtMarcasPln[i].codigo_empleado == dtMarcasMar[k].codigo_empleado)
+                {
+
+                    if (dtMarcasPln[i].horae > dtMarcasMar[k].horae)
+                    {
+                        dtMarcasPln[i].horae = dtMarcasMar[k].horae;
+                    }
+
+                    if (dtMarcasPln[i].horas < dtMarcasMar[k].horas && dtMarcasPln[i].horae != dtMarcasMar[k].horas)
+                    {
+                        dtMarcasPln[i].horas = dtMarcasMar[k].horas;
+                    }
+
+                    if (dtMarcasPln[i].RowState == DataRowState.Modified)
+                    {
+                        dtMarcasUpd.ImportRow(dtMarcasPln[i]);
+                    }
+
+                    k++;
+                }
+            }
+
+            while (k < dtMarcasMar.Rows.Count)
+            {
+                if (TimeSpan.Compare(dtMarcasMar[k].horae, dtMarcasMar[k].horas) == 0)
+                    dtMarcasMar[k].horas = TimeSpan.Zero;
+
+                dtMarcasAdd.ImportRow(dtMarcasMar[k]);
+                k++;
+            }
+
+            int m = datpln.AddMarcasdePlanilla(dtMarcasAdd, idempresa);
+            int p = datpln.UpdMarcasdePlanilla(dtMarcasUpd, idempresa);
+
+            rsp = m.ToString() + "Marcas de Entrada.\n" + p.ToString() + " Marcas de Salida\n" + (dtMarcasPln.Rows.Count + m).ToString();
+            rsp += " Marcas Totales en Planilla. " + dtEmpleado.Rows.Count.ToString() + " Empleados activos en planilla";
+
+            //Codigo quemado para Nairobi
+            Notificacion Msg = new Notificacion();
+            List<string> correos = new List<string>();
+            correos.Add("vporras@kaizen.com.ni");
+            //correos.Add("b@kaizen.com.ni");
+
+            string EncabezadodeCorreo = Fecha.Day.ToString() + "/" + Fecha.Month.ToString() + "/" + Fecha.Year.ToString() + " Importacion de Marcas";
+            Msg.EnviarNotificacionVariosDestinatarios(rsp, EncabezadodeCorreo, correos, "");
+            return rsp;
+
+        }
+		public List<Neg_Empleados> ObtenerHT(DateTime fechainicio, DateTime fechafin, int Ubicacion, int filtro, int userDetail)
+        {
+            //IUserDetail userDetail = UserDetailResolver.getUserDetail();
+
+            Dato_Empleados DEmpleado = new Dato_Empleados();
+            Dato_Marca DMarca = new Dato_Marca();
+            Neg_Permisos NPermisos = new Neg_Permisos();
+            Neg_Turnos NTurnos = new Neg_Turnos();
+            Neg_Feriados NFeriados = new Neg_Feriados();
+            int codigo = 0;
+            try
+            {
+                dsPlanilla.dtEmpleadoDataTable dtEmpleado;
+
+                if (filtro == 4)//cuando se obtienen empleados activos en cierto rango de fechas
+                {
+                    dtEmpleado = DEmpleado.ObtEmpleadosxRangodeTiempo(fechainicio, fechafin, Ubicacion, userDetail); //Ordenado por codigo_empleado
+                }
+                else if (filtro == 9)//llama metodo ncentivos por semana
+                {
+                    dtEmpleado = DEmpleado.pln_empleadosHistoricoSelect(userDetail, fechainicio); //Ordenado por codigo_empleado
+
+                }
+                else if (filtro == 10)//incentivos por dia
+                {
+                    dtEmpleado = DEmpleado.pln_empleadosHistoricoSelectxDiaDistinct(userDetail, fechainicio, fechafin);
+
+                }
+                else//activos yliquidados a la fecha, todos los empleados !=4
+                {
+                    dtEmpleado = DEmpleado.ActivosParaPlanilla(userDetail, filtro, Ubicacion); //Ordenado por codigo_empleado
+                }
+
+                dsPlanilla.dtMarcasDataTable dtHorasT = DMarca.ImportarMarcasdePlanilla(fechainicio, fechafin, userDetail);
+                dsPlanilla.dtPermisosDataTable dtPermisos = NPermisos.PermisosSel(fechainicio, fechafin, userDetail);
+                dsPlanilla.dtTurnoDiaDataTable dtTurnoDia = NTurnos.Todos(userDetail);
+                dsPlanilla.dtFeriadosDataTable dtFeriados = NFeriados.diasFeriados(fechainicio, fechafin, userDetail);
+                dsPlanilla.dtHorasTDataTable dtHT = new dsPlanilla.dtHorasTDataTable();
+                List<Neg_Empleados> Empleados = new List<Neg_Empleados>();
+                int j = 0;
+                int k = 0;
+                int t = 0;
+                int f = 0;
+                double horassemana = 0.0;
+                DateTime fechadefault = new DateTime(1900, 1, 1, 0, 0, 0);
+                DateTime fechagraba = DateTime.Now;
+                for (int i = 0; i < dtEmpleado.Rows.Count; i++)
+                {
+
+                    bool islogT = false;
+                    if (dtEmpleado[i].codigo_empleado == 873173)
+                    {
+                        islogT = true;
+                    }
+
+
+                    bool ConsolidarTurno = false;
+                    double HorasTurno = 0.0;
+                    Neg_Empleados NEmpleado = new Neg_Empleados();
+                    NEmpleado.nombrecompleto = dtEmpleado[i].nombre;
+                    NEmpleado.departamento = dtEmpleado[i].nombre_depto;
+                    NEmpleado.codigo_empleado = dtEmpleado[i].codigo_empleado;
+                    NEmpleado.salariomensual = dtEmpleado[i].salariomensual;
+                    NEmpleado.codigo_cargo = dtEmpleado[i].idcargo;
+                    NEmpleado.cargo = dtEmpleado[i].nombre_cargo;
+                    NEmpleado.saldo_vacaciones = dtEmpleado[i].vacaciones;
+                    NEmpleado.codigo_depto = dtEmpleado[i].iddepartamento;
+                    NEmpleado.moneda = dtEmpleado[i].moneda;
+                    NEmpleado.estado = dtEmpleado[i].idestado;
+                    NEmpleado.flexitime = dtEmpleado[i].flexitime;
+                    NEmpleado.tipocontrato = dtEmpleado[i].tipocontrato;
+                    NEmpleado.p = dtEmpleado[i].p;
+                    NEmpleado.fecheingreso = dtEmpleado[i].fechaingreso;
+                    NEmpleado.opera_simultaneo = dtEmpleado[i].opera_simultaneo;
+                    NEmpleado.operacion = dtEmpleado[i].operacion;
+                    NEmpleado.marca = dtEmpleado[i].marca;
+                    NEmpleado.tiposalario = dtEmpleado[i].idTipoSalario;
+                    DateTime diaplanilla = fechainicio;
+                    DateTime fecini = fechainicio;
+                    if (filtro == 4)
+                    {
+                        fecini = ((!(fechainicio < dtEmpleado[i].fechaingreso)) ? fechainicio : dtEmpleado[i].fechaingreso);
+                        if (fechafin > dtEmpleado[i].fechaegreso && dtEmpleado[i].fechaegreso > dtEmpleado[i].fechaingreso)
+                        {
+                            fechafin = dtEmpleado[i].fechaegreso;
+                        }
+                    }
+                    horassemana = 0.0;
+                    codigo = dtEmpleado[i].codigo_empleado;
+					if(codigo == 868664)
+					{
+						int u = 0;
+					}
+
+                    k = t;
+                    int bonus = 0;
+                    decimal horasseptimo = default(decimal);
+                    double horasturnosemana = 0.0;
+                    double horasturnotrabajadas = 0.0;
+                    double horasturnovacaciones = 0.0;
+                    double horasturnocongoce = 0.0;
+                    double horasturnosingoce = 0.0;
+                    double horasturnosubsidio = 0.0;
+                    int n = 0;
+                    f = 0;
+                    while (n < dtTurnoDia.Rows.Count)
+                    {
+                        double horastrabajadas = 0.0;
+                        double horasturno = 0.0;
+                        double horasvacaciones = 0.0;
+                        double horascongoce = 0.0;
+                        double horassingoce = 0.0;
+                        double horassubsidio = 0.0;
+                        double horaspermiso = 0.0;
+                        if (dtTurnoDia[n].idturno == dtEmpleado[i].idturno)
+                        {
+                            dsPlanilla.dtHorasTRow HT = NEmpleado.dtHorasT.NewdtHorasTRow();
+                            ConsolidarTurno = dtTurnoDia[n].consolidar;
+                            HorasTurno = dtTurnoDia[n].horasturno;
+                            int diainicio = (int)((fecini.DayOfWeek == DayOfWeek.Sunday) ? ((DayOfWeek)7) : fecini.DayOfWeek);
+                            diaplanilla = fecini.AddDays(dtTurnoDia[n].diasemana - diainicio);
+                            if (diaplanilla == new DateTime(2020, 9, 4))
+                            {
+                            }
+                            if (dtTurnoDia[n].diasemana < diainicio)
+                            {
+                                n++;
+                                continue;
+                            }
+                            horasturno = dtTurnoDia[n].horafin.TotalHours - dtTurnoDia[n].horaini.TotalHours - (dtTurnoDia[n].horascomida.TotalHours - dtTurnoDia[n].horaecomida.TotalHours);
+                            horasturno = Math.Round(horasturno, 4);
+                            if (horasturno < 0.0 && dtTurnoDia[n].tipo == 2)
+                            {
+                                horasturno += 24.0;
+                            }
+
+                            HT.turnoini = dtTurnoDia[n].horaini;
+                            HT.turnofin = dtTurnoDia[n].horafin;							
+                            HT.horae = TimeSpan.Zero;
+                            HT.horas = TimeSpan.Zero;
+                            HT.horaini = TimeSpan.Zero;
+                            HT.horafin = TimeSpan.Zero;
+                            horassemana += horasturno;
+                            if (ConsolidarTurno)
+                            {
+                                horassemana = dtTurnoDia[n].horasturno;
+                            }
+                            bonus = dtTurnoDia[n].bonus;
+                            horasseptimo = dtTurnoDia[n].horaseptimo;
+                            HT.diasemana = dtTurnoDia[n].diasemana;
+                            HT.fecha = diaplanilla;
+                            HT.semana = GetIso8601WeekOfYear(diaplanilla);
+                            for (; j < dtHorasT.Rows.Count && dtEmpleado[i].codigo_empleado > dtHorasT[j].codigo_empleado; j++)
+                            {
+                            }
+
+                            if (j < dtHorasT.Rows.Count && dtEmpleado[i].codigo_empleado == dtHorasT[j].codigo_empleado)
+                            {
+                                for (; j < dtHorasT.Rows.Count && diaplanilla > dtHorasT[j].fecha && dtEmpleado[i].codigo_empleado == dtHorasT[j].codigo_empleado; j++)
+                                {
+                                    dsPlanilla.dtHorasTRow HR2 = NEmpleado.dtHorasT.NewdtHorasTRow();
+                                    HR2.horae = TimeSpan.Zero;
+                                    HR2.horaini = TimeSpan.Zero;
+                                    HR2.horas = TimeSpan.Zero;
+                                    HR2.horafin = TimeSpan.Zero;
+                                    HR2.fecha = dtHorasT[j].fecha;
+                                    HR2.diasemana = (int)((dtHorasT[j].fecha.DayOfWeek == DayOfWeek.Sunday) ? ((DayOfWeek)7) : dtHorasT[j].fecha.DayOfWeek);
+                                    HR2.horascg = 0.0;
+                                    HR2.horass = 0.0;
+                                    HR2.horassg = 0.0;
+                                    HR2.horast = 0.0;
+                                    HR2.horasturno = 0.0;
+                                    HR2.horasv = 0.0;
+                                    HR2.horae = dtHorasT[j].horae;
+                                    HR2.horas = dtHorasT[j].horas;
+                                    NEmpleado.dtHorasT.AdddtHorasTRow(HR2);
+                                }
+								if (j < dtHorasT.Rows.Count && diaplanilla == dtHorasT[j].fecha && dtEmpleado[i].codigo_empleado == dtHorasT[j].codigo_empleado)
+								{
+									HT.fecha = dtHorasT[j].fecha;
+									HT.horae = dtHorasT[j].horae;
+									HT.horas = dtHorasT[j].horas;
+									if (!dtEmpleado[i].flexitime)
+									{
+										if (dtHorasT[j].horae < dtTurnoDia[n].horaini)
+										{
+											dtHorasT[j].horae = dtTurnoDia[n].horaini;
+										}
+										if (dtHorasT[j].horas > dtTurnoDia[n].horafin)
+										{
+											dtHorasT[j].horas = dtTurnoDia[n].horafin;
+										}
+									}
+
+									HT.horaini = dtHorasT[j].horae;
+									HT.horafin = dtHorasT[j].horas;
+									horastrabajadas = ((dtHorasT[j].horas.TotalMinutes != 0.0 && !((dtHorasT[j].horas - dtHorasT[j].horae).TotalMinutes < 2.0)) ? RestarHoraDeAlmuerzo(dtHorasT[j].horae, dtHorasT[j].horas, dtTurnoDia[n].horaecomida, dtTurnoDia[n].horascomida) : 0.0);
+
+									j++;
+								}
+                            }
+                            if (dtTurnoDia[n].tipo == 2 && horastrabajadas < 0.0)
+                            {
+                                horastrabajadas += 24.0;
+                            }
+                            for (; f < dtFeriados.Rows.Count; f++)
+                            {
+                                if (!(diaplanilla <= fechafin))
+                                {
+                                    break;
+                                }
+                                if (!(diaplanilla > dtFeriados[f].fechaferiado))
+                                {
+                                    break;
+                                }
+                            }
+                            if (f < dtFeriados.Rows.Count && diaplanilla <= fechafin && diaplanilla == dtFeriados[f].fechaferiado)
+                            {
+                                horascongoce += horasturno;
+                            }
+                            for (t = k; t < dtPermisos.Rows.Count; t++)
+                            {
+                                if (!(diaplanilla <= fechafin))
+                                {
+                                    break;
+                                }
+                               
+                                if (dtEmpleado[i].codigo_empleado == dtPermisos[t].codigo_empleado)
+                                {
+                                    if (diaplanilla >= dtPermisos[t].fechaini && diaplanilla <= dtPermisos[t].fechafin && dtPermisos[t].cantvacaciones >= 1m)
+                                    {
+                                        if (dtPermisos[t].tipo == 1)
+                                        {
+                                            horasvacaciones += horasturno;
+                                        }
+                                        else if (dtPermisos[t].tipo == 3)
+                                        {
+                                            horassingoce += horasturno;
+                                        }
+                                        else if (dtPermisos[t].tipo == 2 || dtPermisos[t].tipo == 4)
+                                        {
+                                            horascongoce += horasturno;
+                                        }
+                                        else if (dtPermisos[t].tipo == 5)
+                                        {
+                                            horascongoce = 0.0;
+                                            horassingoce = 0.0;
+                                            horasvacaciones = 0.0;
+                                            horassubsidio += horasturno;
+                                            break;
+                                        }
+                                    }
+                                    else if (diaplanilla >= dtPermisos[t].fechaini && diaplanilla <= dtPermisos[t].fechafin && dtPermisos[t].horas > 0m)
+                                    {
+                                        horaspermiso = RestarHoraDeAlmuerzo(dtPermisos[t].horaini, dtPermisos[t].horafin, dtTurnoDia[n].horaecomida, dtTurnoDia[n].horascomida);
+                                        horaspermiso = ((horaspermiso > horasturno) ? horasturno : horaspermiso);
+                                        if (dtPermisos[t].tipo == 1)
+                                        {
+                                            horasvacaciones += horaspermiso;
+                                        }
+                                        else if (dtPermisos[t].tipo == 3)
+                                        {
+                                            horassingoce += horaspermiso;
+                                        }
+                                        else if (dtPermisos[t].tipo == 2 || dtPermisos[t].tipo == 4)
+                                        {
+                                            horascongoce += horaspermiso;
+                                        }
+                                        else if (dtPermisos[t].tipo == 5)
+                                        {
+                                            horascongoce = 0.0;
+                                            horassingoce = 0.0;
+                                            horasvacaciones = 0.0;
+                                            horassubsidio += horaspermiso;
+                                            break;
+                                        }
+                                    }
+                                }
+                                else if (dtEmpleado[i].codigo_empleado < dtPermisos[t].codigo_empleado)
+                                {
+                                    break;
+                                }
+                            }
+                            if (!dtEmpleado[i].marca && diaplanilla <= fechafin && dtEmpleado[i].fechaingreso <= diaplanilla && (dtEmpleado[i].IsfechaegresoNull() || diaplanilla <= dtEmpleado[i].fechaegreso || dtEmpleado[i].fechaegreso == fechadefault || dtEmpleado[i].idestado == 1))
+                            {
+                                horastrabajadas = horasturno;
+                            }
+                            if (horasvacaciones < 0.0001)
+                            {
+                                horasvacaciones = 0.0;
+                            }
+                            if (horascongoce < 0.0001)
+                            {
+                                horascongoce = 0.0;
+                            }
+                            if (horastrabajadas < 0.0001)
+                            {
+                                horastrabajadas = 0.0;
+                            }
+                            if (horassingoce < 0.0001)
+                            {
+                                horassingoce = 0.0;
+                            }
+                            if (horassubsidio < 0.0001)
+                            {
+                                horassubsidio = 0.0;
+                            }
+                            if (!dtEmpleado[i].flexitime)
+                            {
+                                ValidarTiempoPermiso(ref horastrabajadas, ref horasvacaciones, ref horascongoce, ref horassingoce, ref horassubsidio, horasturno);
+                            }
+                            HT.horasv = horasvacaciones;
+                            HT.horascg = horascongoce;
+                            HT.horast = horastrabajadas;
+                            HT.horassg = horassingoce;
+                            HT.horass = horassubsidio;
+                            HT.horasturno = horasturno;
+                            horasturnotrabajadas += horastrabajadas;
+                            horasturnovacaciones += horasvacaciones;
+                            horasturnocongoce += horascongoce;
+                            horasturnosingoce += horassingoce;
+                            horasturnosubsidio += horassubsidio;
+                            
+                            horasturnosemana = ((!(dtTurnoDia[n].horasturno > 0.0)) ? (horasturnosemana + horasturno) : HorasTurno);
+                            horasturnosemana = Math.Round(horasturnosemana, 4);
+                            if (!HT.IsfechaNull())
+                            {
+                                NEmpleado.dtHorasT.AdddtHorasTRow(HT);
+                            }
+                        }
+                        n++;
+                        if (dtTurnoDia.Rows.Count != n && (!(diaplanilla >= fechafin) || dtTurnoDia[n - 1].idturno != dtEmpleado[i].idturno))
+                        {
+                            continue;
+                        }
+                        n = dtTurnoDia.Rows.Count;
+                        double horasturnoapagar = 0.0;
+                        if (horasturnotrabajadas > horasturnosemana)
+                        {
+                            horasturnotrabajadas = horasturnosemana;
+                        }
+                        horasturnoapagar = horasturnotrabajadas + horasturnocongoce + horasturnovacaciones;
+                        if (horasturnotrabajadas + horasturnosingoce + horasturnovacaciones + horasturnocongoce + horasturnosubsidio >= horasturnosemana)
+                        {
+                            horasturnoapagar = horasturnosemana - horasturnosingoce - horasturnosubsidio;
+                        }
+                        if (horasturnosingoce + horasturnosubsidio >= horasturnosemana - (double)bonus / 60.0)
+                        {
+                            horasturnoapagar = 0.0;
+                        }
+                        else
+                        {
+                            if (NEmpleado.codigo_empleado == 868664)
+                            {
+                                bool x2 = true;
+                            }
+                            try
+                            {
+                                double prueba2 = (double)bonus / 60.0;
+                                if (horasturnoapagar + horasturnosingoce + horasturnosubsidio >= horasturnosemana - (double)bonus / 60.0 && !ConsolidarTurno)
+                                {
+                                    if (horasturnoapagar > horasturnosemana)
+                                    {
+                                        horasturnoapagar = horasturnosemana;
+                                    }
+                                    horasturnoapagar += (double)horasseptimo;
+                                    horasturnovacaciones *= 1.0 + 8.0 / horasturnosemana;
+                                }
+                                else if (!ConsolidarTurno)
+                                {
+                                    horasturnoapagar += horasturnovacaciones * (8.0 / horasturnosemana);
+                                    horasturnovacaciones *= 1.0 + 8.0 / horasturnosemana;
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                                string m = e2.Message;
+                            }
+                        }
+                        NEmpleado.horasapagar += horasturnoapagar;
+                        NEmpleado.horasturno += horasturnosemana;
+                        NEmpleado.horast += horasturnotrabajadas;
+                        NEmpleado.horasv += horasturnovacaciones;
+                        NEmpleado.horascg += horasturnocongoce;
+                        NEmpleado.horassg += horasturnosingoce;
+                        NEmpleado.horass += horasturnosubsidio;
+                        if (ConsolidarTurno && HorasTurno > 0.0)
+                        {
+                            NEmpleado.horasturno = HorasTurno;
+                        }
+                        if (NEmpleado.codigo_empleado == 868664)
+                        {
+                            bool x = true;
+                        }
+                        fecini = fecini.AddDays(7.0);
+                        int a = (int)((fecini.DayOfWeek == DayOfWeek.Sunday) ? ((DayOfWeek)7) : fecini.DayOfWeek);
+                        fecini = fecini.AddDays(-a + 1);
+                        if (fecini <= fechafin)
+                        {
+                            horasturnoapagar = 0.0;
+                            horasturnosemana = 0.0;
+                            horasturnotrabajadas = 0.0;
+                            horasturnovacaciones = 0.0;
+                            horasturnocongoce = 0.0;
+                            horasturnosingoce = 0.0;
+                            horasturnosubsidio = 0.0;
+                            n = 0;
+                            continue;
+                        }
+                        for (; j < dtHorasT.Rows.Count && dtEmpleado[i].codigo_empleado == dtHorasT[j].codigo_empleado; j++)
+                        {
+                            dsPlanilla.dtHorasTRow HR = NEmpleado.dtHorasT.NewdtHorasTRow();
+                            HR.horae = TimeSpan.Zero;
+                            HR.horaini = TimeSpan.Zero;
+                            HR.horas = TimeSpan.Zero;
+                            HR.horafin = TimeSpan.Zero;
+                            HR.fecha = dtHorasT[j].fecha;
+                            HR.diasemana = (int)((dtHorasT[j].fecha.DayOfWeek == DayOfWeek.Sunday) ? ((DayOfWeek)7) : dtHorasT[j].fecha.DayOfWeek);
+                            HR.horascg = 0.0;
+                            HR.horass = 0.0;
+                            HR.horassg = 0.0;
+                            HR.horast = 0.0;
+                            HR.horasturno = 0.0;
+                            HR.horasv = 0.0;
+                            HR.horae = dtHorasT[j].horae;
+                            HR.horas = dtHorasT[j].horas;
+                            bool islogTz = false;
+                            if ((NEmpleado.codigo_empleado == 868664))
+                            {
+                                islogTz = true;
+                            }
+                            Empleados.Add(NEmpleado);
+                            NEmpleado.dtHorasT.AdddtHorasTRow(HR);
+
+                        }
+                        try
+                        {
+                            double prueba = (double)bonus / 60.0;
+                            if (NEmpleado.horasapagar + NEmpleado.horassg + NEmpleado.horass + NEmpleado.horasv >= NEmpleado.horasturno - (double)bonus / 60.0 && ConsolidarTurno)
+                            {
+                                if (NEmpleado.horasapagar > NEmpleado.horasturno)
+                                {
+                                    NEmpleado.horasapagar = NEmpleado.horasturno;
+                                }
+                                NEmpleado.horasapagar += (double)horasseptimo;
+                                NEmpleado.horasv *= 1.0 + 8.0 / NEmpleado.horasturno;
+                            }
+                            else if (ConsolidarTurno)
+                            {
+                                NEmpleado.horasapagar += NEmpleado.horasv * (8.0 / NEmpleado.horasturno);
+                                NEmpleado.horasv *= 1.0 + 8.0 / NEmpleado.horasturno;
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            string l = e.Message;
+                        }
+                    }
+                    if ((NEmpleado.horasapagar > 0.0 && filtro == 2) || filtro != 2)
+                    {
+                        bool islogTx = false;
+                        if ((NEmpleado.codigo_empleado == 868664)) 
+                        {
+                            islogTx = true;
+                        }
+                        Empleados.Add(NEmpleado);
+                    }
+                }
+                return Empleados;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message + " " + codigo);
+            }
+        }
+
+        public int GetIso8601WeekOfYear(DateTime time)
+        {
+            // Seriously cheat.  If its Monday, Tuesday or Wednesday, then it'll 
+            // be the same week# as whatever Thursday, Friday or Saturday are,
+            // and we always get those right
+            DayOfWeek day = CultureInfo.InvariantCulture.Calendar.GetDayOfWeek(time);
+            if (day >= DayOfWeek.Monday && day <= DayOfWeek.Wednesday)
+            {
+                time = time.AddDays(3);
+            }
+
+            // Return the week of our adjusted day
+            return CultureInfo.InvariantCulture.Calendar.GetWeekOfYear(time, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Monday);
+        }
+
+        public DataSet Inconsistencias(DateTime fechainicio, DateTime fechafin, int ubicacion, double tolerancia)
+        {
+            IUserDetail userDetail = UserDetailResolver.getUserDetail();
+            System.Data.DataSet ds = new System.Data.DataSet();
+            try
+            {
+                List<Neg_Empleados> MEmpleados = ObtenerHT(fechainicio, fechafin, ubicacion, 1, userDetail.getIDEmpresa());
+
+                DataTable dtWorkTable = new DataTable("WorkTable");
+
+                dtWorkTable.Columns.Add("codigo_empleado", typeof(String));
+                dtWorkTable.Columns.Add("nombrecompleto", typeof(String));
+                dtWorkTable.Columns.Add("fecha", typeof(String));
+                dtWorkTable.Columns.Add("entrada", typeof(String));
+                dtWorkTable.Columns.Add("salida", typeof(String));
+                dtWorkTable.Columns.Add("nombre_depto", typeof(String));
+                dtWorkTable.Columns.Add("dia", typeof(String));
+
+                DateTime fechaFinal = DateTime.Now;//20122016
+                DateTime fechaInicial = DateTime.Now;//10012017
+
+                for (int i = 0; i < MEmpleados.Count; i++)
+                {
+
+                    for (int j = 0; j < MEmpleados[i].dtHorasT.Rows.Count; j++)
+                    {
+                        DataRow dr = dtWorkTable.NewRow();
+                        dr["codigo_empleado"] = MEmpleados[i].codigo_empleado;
+                        dr["nombrecompleto"] = MEmpleados[i].nombrecompleto;
+                        dr["nombre_depto"] = MEmpleados[i].departamento;
+
+                        dr["fecha"] = MEmpleados[i].dtHorasT[j].fecha.ToString("dd/MM/yyyy");
+                        dr["entrada"] = MEmpleados[i].dtHorasT[j].horaini;
+                        dr["salida"] = MEmpleados[i].dtHorasT[j].horafin;
+                        dr["dia"] = MEmpleados[i].dtHorasT[j].fecha.DayOfWeek.ToString();
+
+                        if ((MEmpleados[i].dtHorasT[j].horascg + MEmpleados[i].dtHorasT[j].horasv + MEmpleados[i].dtHorasT[j].horast + MEmpleados[i].dtHorasT[j].horass + MEmpleados[i].dtHorasT[j].horassg) < MEmpleados[i].dtHorasT[j].horasturno)
+                        {
+                            dtWorkTable.Rows.Add(dr);
+                        }
+                    }
+                }
+
+                ds.Tables.Add(dtWorkTable);
+
+            }
+            catch (Exception ex)
+            {
+
+            }
+            return ds;
+        }
+
+        public List<Neg_Empleados> ObtenerHT(int periodo, int semana, int ubicacion, int userDetail)
+        {
+            Neg_Periodo NPeriodo = new Neg_Periodo();
+            dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.PeriodoSel(periodo);
+
+            DateTime fechainicio;
+            DateTime fechafin;
+
+            if (!dtPeriodo[0].consolidar && dtPeriodo[0].tplanilla == 1)
+            {
+                if (semana == 1)
+                {
+                    fechainicio = dtPeriodo[0].fechaini;
+                    fechafin = dtPeriodo[0].fechafin;
+                }
+                else
+                {
+                    fechainicio = dtPeriodo[0].fechaini2;
+                    fechafin = dtPeriodo[0].fechafin2;
+                }
+            }
+            else
+            {
+                fechainicio = dtPeriodo[0].fechaini;
+                fechafin = dtPeriodo[0].fechafin2;
+            }
+
+            return ObtenerHT(fechainicio, fechafin, ubicacion, 1, userDetail);
+            // return ObtenerHT(new DateTime(2018,1,15), new DateTime(2018, 1, 30), ubicacion, 1);
+        }
+        public decimal HorasLiquidacionPendiente(int codigo)
+        {
+            return 0;
+        }
+
+        public List<Neg_Empleados> ObtenerHTxE(int codigo_E, DateTime fechainicio, DateTime fechafin, int Ubicacion, int filtro)
+        {
+            IUserDetail userDetail = UserDetailResolver.getUserDetail();
+            List<Neg_Empleados> lt = ObtenerHT(fechainicio, fechafin, Ubicacion, filtro, userDetail.getIDEmpresa());
+            List<Neg_Empleados> lista = lt.Where(x => x.codigo_empleado.Equals(codigo_E)).ToList();
+            lt.Clear();//esto se agrego
+            return lista;
+        }
+		private void ValidarTraslapePermiso(int ini, int fin, dsPlanilla.dtPermisosDataTable dt)
+		{
+			for (int i = ini; i < dt.Rows.Count && i <= fin; i++)
+			{
+				if (dt[i].cantvacaciones >= 1m)
+				{
+					continue;
+				}
+				for (int j = ini; j < dt.Rows.Count && j <= fin; j++)
+				{
+					if (dt[j].cantvacaciones >= 1m || i == j || dt[i].fechaini != dt[j].fechaini || dt[i].fechafin != dt[j].fechafin)
+					{
+						continue;
+					}
+					if (dt[i].horaini <= dt[j].horaini && dt[i].horafin <= dt[j].horafin)
+					{
+						if (dt[i].precedencia <= dt[j].precedencia)
+						{
+							dt[i].horafin = dt[j].horaini;
+						}
+						else
+						{
+							dt[j].horaini = dt[i].horafin;
+						}
+					}
+					else if (dt[i].horaini >= dt[j].horaini && dt[i].horafin >= dt[j].horafin)
+					{
+						if (dt[i].precedencia <= dt[j].precedencia)
+						{
+							dt[i].horaini = dt[j].horafin;
+						}
+						else
+						{
+							dt[j].horafin = dt[i].horaini;
+						}
+					}
+					else if (dt[i].horaini <= dt[j].horaini && dt[i].horafin >= dt[j].horafin)
+					{
+						if (dt[i].precedencia <= dt[j].precedencia)
+						{
+							dt[i].horaini = dt[i].horafin;
+						}
+						else
+						{
+							dt[j].horafin = dt[i].horaini;
+						}
+					}
+				}
+			}
+		}
+
+		private void ValidarTiempoPermiso(ref double horastrabajadas, ref double horasvacaciones, ref double horascongoce, ref double horassingoce, ref double horassubsidio, double horasturno)
+		{
+			if (horasvacaciones < 0.0001)
+			{
+				horasvacaciones = 0.0;
+			}
+			if (horascongoce < 0.0001)
+			{
+				horascongoce = 0.0;
+			}
+			if (horastrabajadas < 0.0001)
+			{
+				horastrabajadas = 0.0;
+			}
+			if (horassingoce < 0.0001)
+			{
+				horassingoce = 0.0;
+			}
+			if (horassubsidio < 0.0001)
+			{
+				horassubsidio = 0.0;
+			}
+			horascongoce = ((horascongoce > horasturno) ? horasturno : horascongoce);
+			horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+			horasvacaciones = ((horasvacaciones < 0.0) ? 0.0 : horasvacaciones);
+			horassingoce = ((horassingoce < 0.0) ? 0.0 : horassingoce);
+			horassubsidio = ((horassubsidio < 0.0) ? 0.0 : horassubsidio);
+			if (horastrabajadas + horascongoce + horasvacaciones + horassingoce > horasturno)
+			{
+				horastrabajadas = horasturno - horascongoce - horassingoce - horasvacaciones;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+			}
+			if (horastrabajadas + horascongoce + horasvacaciones > horasturno)
+			{
+				horastrabajadas = horasturno - horascongoce - horasvacaciones;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+			}
+			if (horastrabajadas + horascongoce + horassingoce > horasturno)
+			{
+				horastrabajadas = horasturno - horascongoce - horassingoce;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+			}
+			if (horastrabajadas + horassingoce + horasvacaciones > horasturno)
+			{
+				horastrabajadas = ((horasturno - horassingoce - horasvacaciones < 0.0) ? 0.0 : (horasturno - horassingoce - horasvacaciones));
+			}
+			if (horasvacaciones + horascongoce + horassingoce > horasturno)
+			{
+				horascongoce = horasturno - horascongoce - horassingoce;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+			}
+			if (horastrabajadas + horasvacaciones > horasturno)
+			{
+				horastrabajadas = horasturno - horasvacaciones;
+				horascongoce = 0.0;
+				horassingoce = 0.0;
+				horassubsidio = 0.0;
+			}
+			if (horastrabajadas + horascongoce > horasturno)
+			{
+				horastrabajadas = horasturno - horascongoce;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+				horasvacaciones = 0.0;
+			}
+			if (horastrabajadas + horassingoce > horasturno)
+			{
+				horastrabajadas = horasturno - horassingoce;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+				horasvacaciones = 0.0;
+				horascongoce = 0.0;
+			}
+			if (horastrabajadas + horassubsidio > horasturno)
+			{
+				horastrabajadas = horasturno - horassubsidio;
+				horastrabajadas = ((horastrabajadas < 0.0) ? 0.0 : horastrabajadas);
+				horasvacaciones = 0.0;
+				horascongoce = 0.0;
+				horassingoce = 0.0;
+			}
+			if (horasvacaciones + horassubsidio > horasturno)
+			{
+				horasvacaciones = horasturno - horassubsidio;
+				horasvacaciones = ((horasvacaciones < 0.0) ? 0.0 : horasvacaciones);
+				horastrabajadas = 0.0;
+				horascongoce = 0.0;
+			}
+			if (horasvacaciones + horassingoce > horasturno)
+			{
+				horasvacaciones = horasturno - horassingoce;
+				horasvacaciones = ((horasvacaciones < 0.0) ? 0.0 : horasvacaciones);
+				horastrabajadas = 0.0;
+				horascongoce = 0.0;
+			}
+			if (horasvacaciones + horascongoce > horasturno)
+			{
+				horascongoce = horasturno - horasvacaciones;
+				horascongoce = ((horascongoce < 0.0) ? 0.0 : horascongoce);
+				horastrabajadas = 0.0;
+			}
+			if (horascongoce + horassingoce > horasturno)
+			{
+				horascongoce = horasturno - horassingoce;
+				horascongoce = ((horascongoce < 0.0) ? 0.0 : horascongoce);
+				horastrabajadas = 0.0;
+			}
+		}
+
+		public string ObtenerReportedeMarcas(DateTime fechainicio, DateTime fechafin, int filtro, int ubicacion)
+		{
+			return ProcesarReportedeMarcas(fechainicio, fechafin, filtro, ubicacion, 0, 0);
+		}
+
+		public string ObtenerReportedeMarcas(DateTime fechainicio, DateTime fechafin, int filtro, int ubicacion, int iddepartamentoini, int iddepartamentofin)
+		{
+			return ProcesarReportedeMarcas(fechainicio, fechafin, filtro, ubicacion, iddepartamentoini, iddepartamentofin);
+		}
+
+		public string ProcesarReportedeMarcas(DateTime fechainicio, DateTime fechafin, int filtro, int ubicacion, int iddepartamentoini, int iddepartamentofin)
+		{
+			DataTable dt = new DataTable();
+			string reporte = "";
+			string consolidado = "";
+			string cabecera = "";
+			int f = filtro;
+			string encabezados1 = "<td></td><td></td>";
+			string encabezados2 = "<td>Codigo</td><td>Nombre</td>";
+			if (filtro == 20)
+			{
+				encabezados1 += "<td></td><td></td>";
+				encabezados2 += "<td>Cargo</td><td>Operacion</td><td>fecha_ingreso</td><td>Departamento</td>";
+			}
+			DateTime fechatmp = fechainicio;
+			while (fechatmp <= fechafin)
+			{
+				encabezados1 = encabezados1 + "<td colspan='2'>" + fechatmp.ToString().Substring(0, 9) + "</td>";
+				fechatmp = fechatmp.AddDays(1.0);
+				encabezados2 += "<td>Entrada</td><td>  Salida</td>";
+			}
+			encabezados1 += "<td></td><td></td><td></td><td></td></tr>";
+			cabecera = cabecera + encabezados1 + "</tr><tr>" + encabezados2 + "<td>Horas T</td><td>Horas SG</td><td>Horas CG</td><td>Horas a Pagar</td></tr>";
+			if (filtro == 20)
+			{
+				f = 5;
+			}
+			List<Neg_Empleados> rmtmp = ObtenerHT(fechainicio, fechafin, ubicacion, f, 1);
+			List<Neg_Empleados> rm = rmtmp.OrderBy((Neg_Empleados o) => o.codigo_depto).ToList();
+			rmtmp.Clear();
+			Neg_Catalogos catalogos = new Neg_Catalogos();
+			DataTable dtdepartamentos = catalogos.selecionarDepartamentos(1);
+			Notificacion Not = new Notificacion();
+			if (filtro == 20)
+			{
+				int t = 0;
+				while (t < rm.Count)
+				{
+					if (rm[t].dtHorasT[0].horae.ToString().Substring(0, 5) != "00:00")
+					{
+						rm.RemoveAt(t);
+					}
+					else
+					{
+						t++;
+					}
+				}
+			}
+			int k = 0;
+			int i = 0;
+			while (i < rm.Count && k < dtdepartamentos.Rows.Count)
+			{
+				int codigo_depto = (int)dtdepartamentos.Rows[k]["codigo_depto"];
+				if (rm[i].codigo_depto > codigo_depto)
+				{
+					k++;
+					continue;
+				}
+				if (rm[i].codigo_depto < codigo_depto)
+				{
+					i++;
+					continue;
+				}
+				fechatmp = fechainicio;
+				string cuerpo = "";
+				string permiso = "";
+				if (filtro == 20)
+				{
+					cuerpo = cuerpo + "<tr><td>" + rm[i].codigo_empleado + "</td><td>" + rm[i].nombrecompleto + "</td>";
+					cuerpo = cuerpo + "<td>" + rm[i].cargo + "</td><td>" + rm[i].operacion + "</td><td>" + rm[i].fecheingreso.ToString("d MMM yyyy") + "</td>";
+					cuerpo = cuerpo + "<td>" + rm[i].departamento + "</td>";
+				}
+				else
+				{
+					cuerpo = cuerpo + "<tr><td>" + rm[i].codigo_empleado + "</td><td>" + rm[i].nombrecompleto + "</td>";
+					permiso += "<tr style = 'background: #81DAF5;'><td></td><td></td>";
+				}
+				int j = 0;
+				
+					while (fechatmp <= fechafin)
+					{
+						if (j < rm[i].dtHorasT.Rows.Count && rm[i].dtHorasT[j].fecha == fechatmp)
+						{
+							string horaentrada = rm[i].dtHorasT[j].horae.ToString().Substring(0, 5);
+							string horasalida = rm[i].dtHorasT[j].horas.ToString().Substring(0, 5);
+							double tiempoplanilla = rm[i].dtHorasT[j].horascg + rm[i].dtHorasT[j].horassg + rm[i].dtHorasT[j].horass + rm[i].dtHorasT[j].horast + rm[i].dtHorasT[j].horasv;
+							cuerpo = ((horaentrada == "00:00" && fechatmp < DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno) ? (cuerpo + "<td bgcolor='#DF0101' >" + horaentrada + "</td>") : ((horaentrada == "00:00" && fechatmp == DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnoini) ? (cuerpo + "<td bgcolor='#DF0101' >" + horaentrada + "</td>") : ((tiempoplanilla < 1.0 && !rm[i].flexitime && (fechatmp < DateTime.Now.Date || (fechatmp == DateTime.Now.Date && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin))) ? (cuerpo + "<td bgcolor='#FFBF00'>" + horaentrada + "</td>") : ((!(tiempoplanilla < rm[i].dtHorasT[j].horasturno - 0.1) || rm[i].flexitime || (!(fechatmp < DateTime.Now.Date) && (!(fechatmp == DateTime.Now.Date) || !(DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin)))) ? (cuerpo + "<td>" + horaentrada + "</td>") : (cuerpo + "<td bgcolor='#FFFF00' >" + horaentrada + "</td>")))));
+							cuerpo = ((horasalida == "00:00" && fechatmp < DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno) ? (cuerpo + "<td bgcolor='#DF0101' >" + horasalida + "</td>") : ((horasalida == "00:00" && fechatmp < DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin) ? (cuerpo + "<td bgcolor='#DF0101' >" + horasalida + "</td>") : ((tiempoplanilla < 1.0 && !rm[i].flexitime && (fechatmp < DateTime.Now.Date || (fechatmp == DateTime.Now.Date && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin))) ? (cuerpo + "<td bgcolor='#FACC2E'>" + horasalida + "</td>") : ((!(tiempoplanilla < rm[i].dtHorasT[j].horasturno - 0.1) || rm[i].flexitime || (!(fechatmp < DateTime.Now.Date) && (!(fechatmp == DateTime.Now.Date) || !(DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin)))) ? (cuerpo + "<td>" + horasalida + "</td>") : (cuerpo + "<td bgcolor='#FFFF00'>" + horasalida + "</td>")))));
+							permiso = ((rm[i].dtHorasT[j].horascg > 0.0) ? (permiso + "<td>" + Math.Round(rm[i].dtHorasT[j].horascg, 2) + "</td><td>PCG</td>") : ((rm[i].dtHorasT[j].horassg > 0.0) ? (permiso + "<td>" + Math.Round(rm[i].dtHorasT[j].horassg, 2) + "</td><td>PSG</td>") : ((rm[i].dtHorasT[j].horasv > 0.0) ? (permiso + "<td>" + Math.Round(rm[i].dtHorasT[j].horasv, 2) + "</td><td>VAC</td>") : ((!(rm[i].dtHorasT[j].horass > 0.0)) ? (permiso + "<td></td><td></td>") : (permiso + "<td>" + Math.Round(rm[i].dtHorasT[j].horass, 2) + "</td><td>SUB</td>")))));
+							j++;
+						}
+						else
+						{
+							cuerpo += "<td>00:00</td><td>00:00</td>";
+							permiso += "<td></td><td></td>";
+						}
+						fechatmp = fechatmp.AddDays(1.0);
+					}
+				
+				permiso += "<td></td><td></td><td></td><td></td>";
+				cuerpo = cuerpo + "<td>" + Math.Round(rm[i].horast, 2) + "</td><td>" + Math.Round(rm[i].horascg, 2) + "</td><td>" + Math.Round(rm[i].horassg, 2) + "</td><td>" + Math.Round(rm[i].horasapagar, 2) + "</td  border = '1'></tr>";
+				reporte += cuerpo;
+				string primeralinea = "<CENTER><table border='1' style='border - collapse: collapse;'> ";
+				if (rm[i].horascg + rm[i].horassg + rm[i].horasv + rm[i].horass > 0.0001)
+				{
+					reporte += permiso;
+				}
+				if (i < rm.Count && codigo_depto == rm[i].codigo_depto && (i + 1 == rm.Count || rm[i].codigo_depto != rm[i + 1].codigo_depto))
+				{
+					int dep = int.Parse(dtdepartamentos.Rows[k]["codigo_depto"].ToString().Trim());
+					string departamento = "<tr align='center' style='background: SteelBlue; color: White;font-weight: bold;'><td colspan='20' border = '1'>" + dtdepartamentos.Rows[k]["nombre_depto"].ToString().Trim() + "</td></tr><tr style = 'background: SteelBlue; color: White;font-weight: bold;'>";
+					reporte = ((iddepartamentoini != 0) ? (departamento + cabecera + reporte) : (primeralinea + departamento + cabecera + reporte + "</table>"));
+					if (dep >= iddepartamentoini && dep <= iddepartamentofin)
+					{
+						consolidado += reporte;
+					}
+					else if (iddepartamentoini == 0 && dtdepartamentos.Rows[k]["jefe"].ToString().Trim().Length > 0)
+					{
+						List<string> L = new List<string>();
+						L.Add(dtdepartamentos.Rows[k]["jefe"].ToString());
+						Not.EnviarNotificacionVariosDestinatarios(reporte, "HORAS A PAGAR " + rm[i].departamento, L, "");
+					}
+					reporte = "";
+					i++;
+					k++;
+				}
+				else
+				{
+					i++;
+				}
+			}
+			if (iddepartamentoini > 0)
+			{
+				consolidado = "<CENTER><table border='1' style='border - collapse: collapse;'> " + consolidado + "</table>";
+			}
+			return consolidado;
+		}
+
+		public string ReportedeMarcasSinEntrada(DateTime fechainicio, DateTime fechafin, int filtro, int ubicacion, int iddepartamentoini, int iddepartamentofin)
+		{
+			DataTable dt = new DataTable();
+			string reporte = "";
+			string consolidado = "";
+			string cabecera = "";
+			string encabezados1 = "<td></td><td></td><td></td><td></td>";
+			string encabezados2 = "<td>Codigo</td><td>Nombre</td><td>Cargo</td><td>Operacion</td><td>fecha_ingreso</td><td>Departamento</td>";
+			DateTime fechatmp = fechainicio;
+			while (fechatmp <= fechafin)
+			{
+				encabezados1 = encabezados1 + "<td colspan='2'>" + fechatmp.ToString().Substring(0, 9) + "</td>";
+				fechatmp = fechatmp.AddDays(1.0);
+				encabezados2 += "<td>Entrada</td><td>Salida</td><td>Permisos</td>";
+			}
+			encabezados1 += "<td></td><td></td><td></td><td></td></tr>";
+			cabecera = cabecera + encabezados1 + "</tr><tr>" + encabezados2;
+			List<Neg_Empleados> rmtmp = ObtenerHT(fechainicio, fechafin, ubicacion, filtro, 1);
+			List<Neg_Empleados> rm = rmtmp.OrderBy((Neg_Empleados o) => o.codigo_depto).ToList();
+			rmtmp.Clear();
+			Neg_Catalogos catalogos = new Neg_Catalogos();
+			DataTable dtdepartamentos = catalogos.selecionarDepartamentos(1);
+			Notificacion Not = new Notificacion();
+			int t = 0;
+			while (t < rm.Count)
+			{
+				if (rm[t].dtHorasT[0].horae.ToString().Substring(0, 5) != "00:00" || rm[t].flexitime || !rm[t].marca)
+				{
+					rm.RemoveAt(t);
+				}
+				else
+				{
+					t++;
+				}
+			}
+			int k = 0;
+			int i = 0;
+			while (i < rm.Count && k < dtdepartamentos.Rows.Count)
+			{
+				int codigo_depto = (int)dtdepartamentos.Rows[k]["codigo_depto"];
+				if (rm[i].codigo_depto > codigo_depto)
+				{
+					k++;
+					continue;
+				}
+				if (rm[i].codigo_depto < codigo_depto)
+				{
+					i++;
+					continue;
+				}
+				fechatmp = fechainicio;
+				string cuerpo = "";
+				string permiso = "";
+				cuerpo = cuerpo + "<tr><td>" + rm[i].codigo_empleado + "</td><td>" + rm[i].nombrecompleto + "</td>";
+				cuerpo = cuerpo + "<td>" + rm[i].cargo + "</td><td>" + rm[i].operacion + "</td><td>" + rm[i].fecheingreso.ToShortDateString() + "</td>";
+				cuerpo = cuerpo + "<td>" + rm[i].departamento + "</td>";
+				int j = 0;
+				while (fechatmp <= fechafin)
+				{
+					if (j < rm[i].dtHorasT.Rows.Count && rm[i].dtHorasT[j].fecha == fechatmp)
+					{
+						string horaentrada = rm[i].dtHorasT[j].horae.ToString().Substring(0, 5);
+						string horasalida = rm[i].dtHorasT[j].horas.ToString().Substring(0, 5);
+						double tiempoplanilla = rm[i].dtHorasT[j].horascg + rm[i].dtHorasT[j].horassg + rm[i].dtHorasT[j].horass + rm[i].dtHorasT[j].horast + rm[i].dtHorasT[j].horasv;
+						cuerpo = ((horaentrada == "00:00" && fechatmp < DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno) ? (cuerpo + "<td bgcolor='#DF0101' >" + horaentrada + "</td>") : ((horaentrada == "00:00" && fechatmp == DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnoini) ? (cuerpo + "<td bgcolor='#DF0101' >" + horaentrada + "</td>") : ((tiempoplanilla < 1.0 && !rm[i].flexitime && (fechatmp < DateTime.Now.Date || (fechatmp == DateTime.Now.Date && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin))) ? (cuerpo + "<td bgcolor='#FFBF00'>" + horaentrada + "</td>") : ((!(tiempoplanilla < rm[i].dtHorasT[j].horasturno - 0.1) || rm[i].flexitime || (!(fechatmp < DateTime.Now.Date) && (!(fechatmp == DateTime.Now.Date) || !(DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin)))) ? (cuerpo + "<td>" + horaentrada + "</td>") : (cuerpo + "<td bgcolor='#FFFF00' >" + horaentrada + "</td>")))));
+						cuerpo = ((horasalida == "00:00" && fechatmp < DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno) ? (cuerpo + "<td bgcolor='#DF0101' >" + horasalida + "</td>") : ((horasalida == "00:00" && fechatmp < DateTime.Now.Date && tiempoplanilla < rm[i].dtHorasT[j].horasturno && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin) ? (cuerpo + "<td bgcolor='#DF0101' >" + horasalida + "</td>") : ((tiempoplanilla < 1.0 && !rm[i].flexitime && (fechatmp < DateTime.Now.Date || (fechatmp == DateTime.Now.Date && DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin))) ? (cuerpo + "<td bgcolor='#FACC2E'>" + horasalida + "</td>") : ((!(tiempoplanilla < rm[i].dtHorasT[j].horasturno - 0.1) || rm[i].flexitime || (!(fechatmp < DateTime.Now.Date) && (!(fechatmp == DateTime.Now.Date) || !(DateTime.Now.TimeOfDay > rm[i].dtHorasT[j].turnofin)))) ? (cuerpo + "<td>" + horasalida + "</td>") : (cuerpo + "<td bgcolor='#FFFF00'>" + horasalida + "</td>")))));
+						permiso = ((rm[i].dtHorasT[j].horascg > 0.0) ? (permiso + "<td></td><td></td><td></td><td></td><td></td><td></td><td>" + Math.Round(rm[i].dtHorasT[j].horascg, 2) + "</td><td>PCG</td>") : ((rm[i].dtHorasT[j].horassg > 0.0) ? (permiso + "<td></td><td></td><td></td><td></td><td></td><td></td><td>" + Math.Round(rm[i].dtHorasT[j].horassg, 2) + "</td><td>PSG</td>") : ((rm[i].dtHorasT[j].horasv > 0.0) ? (permiso + "<td></td><td></td><td></td><td></td><td></td><td></td><td>" + Math.Round(rm[i].dtHorasT[j].horasv, 2) + "</td><td>VAC</td>") : ((!(rm[i].dtHorasT[j].horass > 0.0)) ? (permiso + "<td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>") : (permiso + "<td></td><td></td><td></td><td></td><td></td><td></td><td>" + Math.Round(rm[i].dtHorasT[j].horass, 2) + "</td><td>SUB</td>")))));
+						j++;
+					}
+					else
+					{
+						cuerpo += "<td>00:00</td><td>00:00</td>";
+					}
+					fechatmp = fechatmp.AddDays(1.0);
+				}
+				cuerpo += "</tr>";
+				reporte += cuerpo;
+				string primeralinea = "<CENTER><table style='border - collapse: collapse;'> ";
+				if (rm[i].horascg + rm[i].horassg + rm[i].horasv + rm[i].horass > 0.0001)
+				{
+					reporte += permiso;
+				}
+				if (i < rm.Count && codigo_depto == rm[i].codigo_depto && (i + 1 == rm.Count || rm[i].codigo_depto != rm[i + 1].codigo_depto))
+				{
+					int dep = int.Parse(dtdepartamentos.Rows[k]["codigo_depto"].ToString().Trim());
+					string departamento = "";
+					reporte = ((iddepartamentoini != 0) ? (departamento + reporte) : (primeralinea + departamento + reporte + "</table>"));
+					if (dep >= iddepartamentoini && dep <= iddepartamentofin)
+					{
+						consolidado += reporte;
+					}
+					else if (iddepartamentoini == 0 && dtdepartamentos.Rows[k]["jefe"].ToString().Trim().Length > 0)
+					{
+						List<string> L = new List<string>();
+						L.Add(dtdepartamentos.Rows[k]["jefe"].ToString());
+						Not.EnviarNotificacionVariosDestinatarios(reporte, "HORAS A PAGAR " + rm[i].departamento, L, "");
+					}
+					reporte = "";
+					i++;
+					k++;
+				}
+				else
+				{
+					i++;
+				}
+			}
+			if (iddepartamentoini > 0)
+			{
+				consolidado = "<CENTER><table border='1' style='border - collapse: collapse;'> " + consolidado + "</table>";
+			}
+			return consolidado;
+		}
+
+		public double RestarHoraDeAlmuerzo(TimeSpan horae, TimeSpan horas, TimeSpan horaecomida, TimeSpan horascomida)
+		{
+			double horastrabajadas = 0.0;
+			if (horae == TimeSpan.Zero || horas == TimeSpan.Zero)
+			{
+				return 0.0;
+			}
+			if (horas <= horaecomida || horae >= horascomida || horaecomida == TimeSpan.Zero || horascomida == TimeSpan.Zero)
+			{
+				horastrabajadas = horas.TotalHours - horae.TotalHours;
+			}
+			else if (horae <= horaecomida && horas >= horascomida)
+			{
+				horastrabajadas += horas.TotalHours - horae.TotalHours - (horascomida.TotalHours - horaecomida.TotalHours);
+			}
+			else if (horae >= horaecomida && horae <= horascomida && horas >= horascomida)
+			{
+				horastrabajadas = horas.TotalHours - horae.TotalHours - (horascomida.TotalHours - horae.TotalHours);
+			}
+			else if (horas >= horaecomida && horas <= horascomida && horae <= horaecomida)
+			{
+				horastrabajadas = horas.TotalHours - horae.TotalHours - (horas.TotalHours - horaecomida.TotalHours);
+			}
+			return horastrabajadas;
+		}
+
+		public DataTable ObtenerHorasExtrasAprobacion(DateTime ini, DateTime fin, int proceso, int periodo, bool declaracion)
+		{
+			try
+			{
+				DataSet ds = new DataSet();
+				DataTable dt = new DataTable();
+				dt.Columns.Add("codigo_empleado", typeof(int));
+				dt.Columns.Add("nombrecompleto", typeof(string));
+				dt.Columns.Add("codigo_depto", typeof(int));
+				dt.Columns.Add("nombre_depto", typeof(string));
+				dt.Columns.Add("fecha", typeof(DateTime));
+				dt.Columns.Add("horaini", typeof(TimeSpan));
+				dt.Columns.Add("horafin", typeof(TimeSpan));
+				dt.Columns.Add("total", typeof(double));
+				dt.Columns.Add("acumulado", typeof(double));
+				dt.Columns.Add("estatus", typeof(string));
+				dt.Columns.Add("tipoingrdeduc", typeof(int));
+				dt.Columns.Add("nombrerubro", typeof(string));
+				dt.Columns.Add("comentario", typeof(string));
+				dt.Columns.Add("periodo", typeof(int));
+				dt.Columns.Add("costo", typeof(decimal));
+				dt.Columns.Add("depto_afecta", typeof(int));
+				dt.Columns.Add("tiempo_libre", typeof(decimal));
+				dt.Columns.Add("HEPagar", typeof(double));
+				dt.Columns.Add("revision", typeof(bool));
+				dt.Columns.Add("gerenciarequiere", typeof(string));
+				IUserDetail userDetail = UserDetailResolver.getUserDetail();
+				DataTable deptos = new DataTable();
+				if (proceso == 1)
+				{
+					Neg_Catalogos neg_Catalogos = new Neg_Catalogos();
+					deptos = neg_Catalogos.PlnObtenerDeptosSuburdinados(userDetail.getUserCodEmpleado());
+				}
+				Neg_DevYDed Neg_DevYDed = new Neg_DevYDed();
+				DataTable rpt;
+				if (proceso != 2)
+				{
+					DateTime sini = DateTime.Now;
+					DateTime sfin = DateTime.Now;
+					if (proceso == 1)
+					{
+						if (ini.DayOfWeek == DayOfWeek.Sunday)
+						{
+							sini = ini.AddDays((double)(ini.DayOfWeek - 6)).Date;
+							sfin = ini.Date;
+						}
+						else
+						{
+							sini = ini.AddDays(0 - ini.DayOfWeek + 1).Date;
+							sfin = ini.AddDays((double)(7 - ini.DayOfWeek)).Date;
+						}
+					}
+					else
+					{
+						sini = ini;
+						sfin = fin;
+					}
+					rpt = Neg_DevYDed.ObtenerDetalleHorasExtrasxFecha(1, 0, sini, sfin);
+				}
+				else
+				{
+					rpt = Neg_DevYDed.ObtenerDetalleHorasExtrasxFecha(2, periodo, DateTime.Now, DateTime.Now);
+				}
+				List<Neg_Empleados> lt = new List<Neg_Empleados>();
+				if (proceso == 2)
+				{
+					if (rpt.Rows.Count > 0)
+					{
+						DataRow[] fechas = (from c in rpt.AsEnumerable()
+											group c by c.Field<DateTime>("fecha") into g
+											select g.First()).ToArray();
+						DateTime fechaini = Convert.ToDateTime(fechas.OrderBy((DataRow f) => f.Field<DateTime>("fecha")).Take(1).First()["fecha"]);
+						DateTime fechafin = Convert.ToDateTime(fechas.OrderByDescending((DataRow f) => f.Field<DateTime>("fecha")).Take(1).First()["fecha"]);
+						lt = ObtenerHT(fechaini, fechafin, 3, 1, userDetail.getIDEmpresa());
+					}
+				}
+				else
+				{
+					lt = ObtenerHT(ini, fin, 3, 1, userDetail.getIDEmpresa());
+				}
+				List<Neg_Empleados> empleados = new List<Neg_Empleados>();
+				DataRow[] empleadoreg = null;
+				DataRow[] empleadofecha = null;
+				List<int> codigos = new List<int>();
+				switch (proceso)
+				{
+					case 1:
+						codigos = (from u in deptos.AsEnumerable()
+								   select u.Field<int>("codigo_depto")).Distinct().ToList();
+						empleados = lt.Where((Neg_Empleados a) => codigos.Contains(a.codigo_depto)).ToList();
+						break;
+					case 2:
+						codigos = (from u in rpt.AsEnumerable()
+								   select u.Field<int>("codigo_empleado")).Distinct().ToList();
+						empleados = lt.Where((Neg_Empleados a) => codigos.Contains(a.codigo_empleado)).ToList();
+						break;
+					default:
+						empleados = lt;
+						break;
+				}
+				foreach (Neg_Empleados i in empleados)
+				{
+					if (i.codigo_empleado == 86996)
+					{
+					}
+					decimal acumulado = default(decimal);
+					empleadoreg = (from c in rpt.AsEnumerable()
+								   where c.Field<int>("codigo_empleado") == i.codigo_empleado && c.Field<int>("id_tipo") != 25
+								   select c).ToArray();
+					if (empleadoreg.Length != 0)
+					{
+						acumulado = empleadoreg.Sum((DataRow c) => c.Field<decimal>("tiempo"));
+					}
+					foreach (DataRow item in i.dtHorasT.Rows)
+					{
+						double horasextras = 0.0;
+						double HEPagar = 0.0;
+						bool revision = false;
+						int tipoingrdeduc = 0;
+						int depto_afecta = 0;
+						decimal costo = default(decimal);
+						decimal tiempo_libre = 0.00m;
+						string nombrerubro = "";
+						string comentario = "";
+						string estatus = "";
+						string gerencia = "";
+						TimeSpan horainicio = TimeSpan.Zero;
+						TimeSpan horafin = TimeSpan.Zero;
+						horainicio = ((!(Convert.ToDecimal(item["horasturno"]) > 0m)) ? TimeSpan.Parse(item["horae"].ToString()) : ((!(Convert.ToDecimal(item["horascg"]) == Convert.ToDecimal(item["horasturno"])) || !(Convert.ToDecimal(item["horascg"]) > 0m)) ? TimeSpan.Parse(item["turnofin"].ToString()) : TimeSpan.Parse(item["horae"].ToString())));
+						horafin = TimeSpan.Parse(item["horas"].ToString());
+						horasextras = horafin.TotalHours - horainicio.TotalHours;
+						empleadofecha = empleadoreg.Where((DataRow c) => c.Field<DateTime>("fecha") == Convert.ToDateTime(item["fecha"]) && c.Field<int>("id_tipo") != 25).ToArray();
+						if (empleadofecha.Length != 0)
+						{
+							periodo = empleadofecha[0].Field<int>("periodo");
+							revision = declaracion || empleadofecha[0].Field<bool>("revision");
+							comentario = empleadofecha[0].Field<string>("comentario");
+							depto_afecta = empleadofecha[0].Field<int>("depto_afecta");
+							costo = empleadofecha[0].Field<decimal>("valor");
+							tiempo_libre = empleadofecha[0].Field<decimal>("tiempo_libre");
+							HEPagar = Convert.ToDouble(empleadofecha[0].Field<decimal>("tiempo"));
+							gerencia = empleadofecha[0].Field<string>("gerenciarequiere");
+							if ((proceso == 2 && revision) || (proceso == 1 && !revision) || proceso == 3)
+							{
+								continue;
+							}
+							tipoingrdeduc = empleadofecha[0].Field<int>("tipoingrdeduc");
+							nombrerubro = empleadofecha[0].Field<string>("nombrerubro");
+							estatus = ((periodo != 0) ? "Aplicado" : ((!revision) ? "Aprobado" : "En Revision"));
+						}
+						else
+						{
+							estatus = "No Pago";
+							HEPagar = horasextras;
+							if (proceso == 2 || horasextras <= 0.5)
+							{
+								continue;
+							}
+						}
+						dt.Rows.Add(i.codigo_empleado, i.nombrecompleto, i.codigo_depto, i.departamento, Convert.ToDateTime(item["fecha"]), horainicio, horafin, horasextras, acumulado, estatus, tipoingrdeduc, nombrerubro, comentario, periodo, costo, depto_afecta, tiempo_libre, Math.Round(HEPagar, 2), revision, gerencia);
+					}
+				}
+				return dt;
+			}
+			catch (Exception ex)
+			{
+				throw new Exception(ex.Message);
+			}
+		}
+
+		public void VerificarTipoIngresoExcedente(DateTime fecha, int periodo, int codigo, int tipop, decimal horasdia, decimal tiempolibre, int depto_afecta, string user)
+		{
+			Neg_Planilla Neg_Planilla = new Neg_Planilla();
+			DateTime sini = DateTime.Now;
+			DateTime sfin = DateTime.Now;
+			if (fecha.DayOfWeek == DayOfWeek.Sunday)
+			{
+				sini = fecha.AddDays((double)(fecha.DayOfWeek - 6)).Date;
+				sfin = fecha.Date;
+			}
+			else
+			{
+				sini = fecha.AddDays(0 - fecha.DayOfWeek + 1).Date;
+				sfin = fecha.AddDays((double)(7 - fecha.DayOfWeek)).Date;
+			}
+			Neg_DevYDed Neg_DevYDed = new Neg_DevYDed();
+			DataTable rpt = Neg_DevYDed.ObtenerDetalleHorasExtrasxFecha(1, 0, sini, sfin);
+			decimal acumulado = default(decimal);
+			decimal horas = default(decimal);
+			decimal horas_acum = default(decimal);
+			DataRow[] empleadoreg = null;
+			empleadoreg = (from c in rpt.AsEnumerable()
+						   where c.Field<int>("codigo_empleado") == codigo && !c.Field<bool>("revision") && c.Field<int>("tipoingrdeduc") == 1
+						   select c).ToArray();
+			if (empleadoreg.Length != 0)
+			{
+				acumulado += empleadoreg.Sum((DataRow c) => c.Field<decimal>("tiempo"));
+			}
+			acumulado += horasdia;
+			if (acumulado > 9m && tipop == 1)
+			{
+				if (!Neg_Planilla.insertarHorasExtrasxDia(codigo, periodo, 25, fecha, horasdia, tiempolibre, depto_afecta, user))
+				{
+					throw new Exception("Error registrando HE dia.");
+				}
+			}
+			else if (!Neg_Planilla.insertarHorasExtrasxDia(codigo, periodo, tipop, fecha, horasdia, tiempolibre, depto_afecta, user))
+			{
+				throw new Exception("Error registrando HE dia.");
+			}
+		}
+
+		public DataTable ObtenerMarcasHorasOficial(DateTime Inicio, DateTime Fin, int filtro, int ubic, int dpto)
+		{
+
+
+            Neg_DevYDed Neg_DevYDed = new Neg_DevYDed();
+			Neg_Informes Neg_Informes = new Neg_Informes();
+			DataTable ds = null;
+			ds = Neg_Informes.spMarcasSelxFecha(Inicio, Fin, filtro, ubic, dpto);
+			DataTable rpt = Neg_DevYDed.ObtenerDetalleHorasExtrasxFecha(3, 0, Inicio, Fin);
+			DataRow[] empleadoreg = null;
+			DataTable dtInD = new DataTable();
+			dtInD.Columns.Add("codigo_empleado", typeof(int));
+			dtInD.Columns.Add("nombrecompleto", typeof(string));
+			dtInD.Columns.Add("fecha", typeof(string));
+			dtInD.Columns.Add("entrada", typeof(TimeSpan));
+			dtInD.Columns.Add("salida", typeof(TimeSpan));
+			dtInD.Columns.Add("nombre_depto", typeof(string));
+			dtInD.Columns.Add("dia", typeof(string));
+			dtInD.Columns.Add("nombreturno", typeof(string));
+
+            Debug.Write("hola mundo");
+			foreach (DataRow item in ds.Rows)
+			{
+				empleadoreg = null;
+               
+                TimeSpan horae = TimeSpan.Parse(item["entrada"].ToString());
+				double horasdia = TimeSpan.Parse(item["salida"].ToString()).TotalHours - horae.TotalHours;
+                // para ver los datos
+           
+                if (!(horasdia > 0.0))
+				{
+					continue;
+				}
+				empleadoreg = (from c in rpt.AsEnumerable()
+							   where c.Field<int>("codigo_empleado") == Convert.ToInt32(item["codigo_empleado"]) && c.Field<DateTime>("fecha") == Convert.ToDateTime(item["fecha"]) && c.Field<int>("id_tipo") == 1 && (c.Field<int>("tipoingrdeduc") == 25 || c.Field<int>("tipoingrdeduc") == 33)
+							   select c).ToArray();
+				if (empleadoreg.Length != 0)
+				{
+					TimeSpan salidaReal = TimeSpan.Parse(item["salida"].ToString());
+					double tiempo = Convert.ToDouble(empleadoreg.FirstOrDefault()["tiempo"]);
+					double tiempo_libre = Convert.ToDouble(empleadoreg.FirstOrDefault()["tiempo_libre"]);
+					double totalh = tiempo + tiempo_libre;
+					int hora = (int)totalh;
+					int min = (int)((totalh - double.Parse(hora.ToString())) * 60.0);
+					TimeSpan salidaModif = salidaReal.Add(new TimeSpan(-hora, -min, 0));
+					double difhrs = salidaModif.TotalHours - horae.TotalHours;
+					if (difhrs >= 1.0)
+					{
+						dtInD.Rows.Add(item["codigo_empleado"].ToString(), item["nombrecompleto"].ToString(), Convert.ToDateTime(item["fecha"].ToString()).ToShortDateString(), TimeSpan.Parse(item["entrada"].ToString()), salidaModif, item["nombre_depto"].ToString(), item["dia"].ToString(), item["nombreturno"].ToString());
+					}
+				}
+				else
+				{
+					dtInD.Rows.Add(item["codigo_empleado"].ToString(), item["nombrecompleto"].ToString(), Convert.ToDateTime(item["fecha"].ToString()).ToShortDateString(), TimeSpan.Parse(item["entrada"].ToString()), TimeSpan.Parse(item["salida"].ToString()), item["nombre_depto"].ToString(), item["dia"].ToString(), item["nombreturno"].ToString());
+				}
+			}
+			return dtInD;
+		}
+	}
+
+}

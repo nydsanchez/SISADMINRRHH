@@ -1,0 +1,7 @@
+2025-01-11 07:28:27.0840 Info Aplicación iniciada.
+2025-01-11 12:33:51.5245 Info Aplicación iniciada.
+2025-01-11 12:33:52.7745 Info Session Iniciada por Usuario: marcas
+2025-01-11 12:33:56.7278 Info Session Iniciada por Usuario: marcas
+2025-01-11 12:34:00.2435 Info Session Iniciada por Usuario: marcas
+2025-01-11 12:34:05.7280 Info Session Iniciada por Usuario: marcas
+2025-01-11 12:34:08.3218 Info Session Iniciada por Usuario: marcas

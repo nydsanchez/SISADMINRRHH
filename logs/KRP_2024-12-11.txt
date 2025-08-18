@@ -1,0 +1,9 @@
+2024-12-11 10:58:59.0767 Info Aplicación iniciada.
+2024-12-11 10:59:20.3515 Info Session Iniciada por Usuario: vporras
+2024-12-11 10:59:24.9726 Info Session Iniciada por Usuario: vporras
+2024-12-11 10:59:55.5804 Info Session Iniciada por Usuario: vporras
+2024-12-11 10:59:56.8726 Info Session Iniciada por Usuario: vporras
+2024-12-11 11:00:03.5410 Info Session Iniciada por Usuario: vporras
+2024-12-11 11:00:07.0108 Info Session Iniciada por Usuario: vporras
+2024-12-11 11:00:14.9246 Info Session Iniciada por Usuario: vporras
+2024-12-11 11:00:19.2163 Info Session Iniciada por Usuario: vporras

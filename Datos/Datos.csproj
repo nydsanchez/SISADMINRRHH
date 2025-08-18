@@ -1,0 +1,165 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{3F8BBA72-06E6-4791-A144-F82A6D58A68D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Datos</RootNamespace>
+    <AssemblyName>Datos</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.SqlServer.Types, Version=11.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.SqlServer.Types.11.0.2\lib\net20\Microsoft.SqlServer.Types.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=6.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.6.0.1\lib\net45\NLog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CnBD.cs" />
+    <Compile Include="ConnectionRepository.cs" />
+    <Compile Include="Datos_Amonestaciones.cs" />
+    <Compile Include="Dato_Operacion.cs" />
+    <Compile Include="Dato_Cargo.cs" />
+    <Compile Include="Dato_Catalogos.cs" />
+    <Compile Include="Dato_DevYDed.cs" />
+    <Compile Include="Dato_Eficiencia.cs" />
+    <Compile Include="Dato_Empleados.cs" />
+    <Compile Include="Dato_Empresas.cs" />
+    <Compile Include="Dato_Factores.cs" />
+    <Compile Include="Dato_Feriados.cs" />
+    <Compile Include="Dato_Comedor.cs" />
+    <Compile Include="Dato_Incentivos.cs" />
+    <Compile Include="Dato_PlnConstruccionIncentivo.cs" />
+    <Compile Include="Dato_Cooperativa.cs" />
+    <Compile Include="Dato_PlnRangoOql.cs" />
+    <Compile Include="Dato_TablaIncentivo.cs" />
+    <Compile Include="Dato_Informes.cs" />
+    <Compile Include="Dato_INSS.cs" />
+    <Compile Include="Dato_IR.cs" />
+    <Compile Include="Dato_Jerarquia.cs" />
+    <Compile Include="Dato_Liquidacion.cs" />
+    <Compile Include="Dato_Marca.cs" />
+    <Compile Include="Dato_Menu.cs" />
+    <Compile Include="Dato_MenuPerfil.cs" />
+    <Compile Include="Dato_Parametros.cs" />
+    <Compile Include="Dato_Perfil.cs" />
+    <Compile Include="Dato_Periodo.cs" />
+    <Compile Include="Dato_Permisos.cs" />
+    <Compile Include="Dato_Planilla.cs" />
+    <Compile Include="Dato_PlnEficienciaModulo.cs" />
+    <Compile Include="Dato_PlnProteccionDzxFecha.cs" />
+    <Compile Include="Dato_Retenciones.cs" />
+    <Compile Include="Dato_Turnos.cs" />
+    <Compile Include="Dato_Usuario.cs" />
+    <Compile Include="Dato_UsuarioPerfil.cs" />
+    <Compile Include="dsInss.cs">
+      <DependentUpon>dsInss.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="dsInss.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsInss.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="dsPlanilla.cs">
+      <DependentUpon>dsPlanilla.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="dsPlanilla1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>dsPlanilla.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="Menu.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SqlServerTypes\Loader.cs" />
+    <Compile Include="Usuario.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="dsInss.xsc">
+      <DependentUpon>dsInss.xsd</DependentUpon>
+    </None>
+    <None Include="dsInss.xsd">
+      <SubType>Designer</SubType>
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>dsInss.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="dsInss.xss">
+      <DependentUpon>dsInss.xsd</DependentUpon>
+    </None>
+    <None Include="dsPlanilla.xsc">
+      <DependentUpon>dsPlanilla.xsd</DependentUpon>
+    </None>
+    <None Include="dsPlanilla.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>dsPlanilla1.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="dsPlanilla.xss">
+      <DependentUpon>dsPlanilla.xsd</DependentUpon>
+    </None>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x64\msvcr100.dll">
+      <Link>SqlServerTypes\x64\msvcr100.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x64\SqlServerSpatial110.dll">
+      <Link>SqlServerTypes\x64\SqlServerSpatial110.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x86\msvcr100.dll">
+      <Link>SqlServerTypes\x86\msvcr100.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\packages\Microsoft.SqlServer.Types.11.0.2\nativeBinaries\x86\SqlServerSpatial110.dll">
+      <Link>SqlServerTypes\x86\SqlServerSpatial110.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SqlServerTypes\readme.htm" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

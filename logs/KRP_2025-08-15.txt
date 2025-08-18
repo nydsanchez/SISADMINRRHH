@@ -1,0 +1,55 @@
+2025-08-15 11:47:46.1585 Info Aplicación iniciada.
+2025-08-15 11:48:06.9428 Info Session Iniciada por Usuario: itsupport
+2025-08-15 11:48:14.5418 Info Session Iniciada por Usuario: itsupport
+2025-08-15 11:48:22.2492 Info Session Iniciada por Usuario: itsupport
+2025-08-15 11:48:24.3793 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:16:45.5497 Info Aplicación iniciada.
+2025-08-15 14:16:51.8340 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:17:01.4209 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:17:08.9671 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:17:13.4055 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:55:07.7720 Info Aplicación iniciada.
+2025-08-15 14:55:12.8143 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:55:29.9158 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:55:38.3922 Info Session Iniciada por Usuario: itsupport
+2025-08-15 14:55:40.5130 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:48:28.7124 Info Aplicación iniciada.
+2025-08-15 16:48:34.7682 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:48:51.3510 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:48:59.7599 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:05.7884 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:11.7413 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:21.3671 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:30.2887 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:37.5490 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:43.2755 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:55.1124 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:49:56.5849 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:50:53.7527 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:51:04.6393 Info Session Iniciada por Usuario: itsupport
+2025-08-15 16:51:07.7741 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:18:29.9954 Info Aplicación iniciada.
+2025-08-15 17:18:44.6360 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:19:05.1249 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:19:17.0452 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:19:25.3102 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:22:03.3271 Info Aplicación iniciada.
+2025-08-15 17:22:08.4603 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:22:15.1536 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:22:42.5893 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:22:44.2885 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:30:28.7403 Info Aplicación iniciada.
+2025-08-15 17:31:23.0126 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:31:47.2613 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:32:03.7175 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:32:06.0160 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:44:43.0677 Info Aplicación iniciada.
+2025-08-15 17:44:54.7215 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:45:15.7079 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:45:29.5157 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:45:31.3649 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:47:57.2559 Info Aplicación iniciada.
+2025-08-15 17:48:41.8202 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:48:51.5846 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:49:21.1905 Info Session Iniciada por Usuario: itsupport
+2025-08-15 17:49:22.6138 Info Session Iniciada por Usuario: itsupport

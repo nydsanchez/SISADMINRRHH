@@ -1,0 +1,11 @@
+2025-07-10 11:43:24.7617 Info Aplicación iniciada.
+2025-07-10 11:48:34.3522 Info Aplicación iniciada.
+2025-07-10 11:53:30.1381 Info Aplicación iniciada.
+2025-07-10 11:59:18.5636 Info Aplicación iniciada.
+2025-07-10 11:59:38.3797 Info Session Iniciada por Usuario: itsupport
+2025-07-10 11:59:46.8749 Info Session Iniciada por Usuario: itsupport
+2025-07-10 12:00:42.3052 Info Session Iniciada por Usuario: itsupport
+2025-07-10 12:01:08.5929 Info Session Iniciada por Usuario: itsupport
+2025-07-10 12:01:21.0534 Info Session Iniciada por Usuario: itsupport
+2025-07-10 12:01:29.0045 Info Session Iniciada por Usuario: itsupport
+2025-07-10 12:01:44.1192 Info Session Iniciada por Usuario: itsupport

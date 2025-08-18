@@ -1,0 +1,70 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="NominaRRHH.SiteMaster" EnableViewState="true" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <title>Planilla</title>
+    <meta charset="UTF-8">
+    <link href="Content/bootstrap.css" rel="stylesheet" />
+<link href="Content/datepicker.css" rel="stylesheet" />
+<link href="Content/Styles.css" rel="stylesheet" />
+<link href="Content/bootstrap-datetimepicker.css" rel="stylesheet" />
+<script type="text/javascript" src='<%#  Page.ResolveClientUrl("~/Scripts/jquery-1.11.3.min.js") %>'></script>
+<script type="text/javascript" src='<%#  Page.ResolveClientUrl("~/Scripts/bootstrap.min.js") %>'></script>
+    <style>
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #f8f9fa; /* Color de fondo */
+    text-align: center; /* Centrar texto */
+    padding: 5px; /* Espaciado interno */
+    box-shadow: 0 -1px 5px rgba(0,0,0,0.1); /* Sombra superior */
+}
+
+.footer .container {
+    max-width: 1000px; /* Ancho máximo del contenido */
+    margin: auto; /* Centrar el contenedor */
+}
+</style>
+</head>
+    <asp:ContentPlaceHolder runat="server" ID="HeadContent" />
+<body>
+    <%--<form runat="server">        
+       <asp:Literal ID="ltMenu" runat="server">
+        </asp:Literal>
+        <div>
+            <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+        </div>
+        <asp:Literal ID="ltUsuario" runat="server">
+        </asp:Literal>
+         <asp:ContentPlaceHolder runat="server" ID="FeaturedContent" />
+         <asp:ContentPlaceHolder runat="server" ID="ContentPlaceHolder1" />
+    </form>--%>
+    <form runat="server">        
+    <asp:Literal ID="ltMenu" runat="server"></asp:Literal>
+    <span class="text-muted"></span>
+    <div>
+        <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+    </div>
+    
+    <asp:ContentPlaceHolder runat="server" ID="FeaturedContent" />
+    <asp:ContentPlaceHolder runat="server" ID="ContentPlaceHolder1" />
+   <%-- <footer class="footer">
+        <div class="container">
+            <asp:Literal ID="ltUsuario" runat="server"></asp:Literal><span class="text-muted"></span>
+            <asp:Button ID="btnSalir" runat="server" Text="Salir" OnClick="btnSalir_Click" Width="63px" Height="20px" Font-Size="Smaller" ToolTip="Salir del Formulario Actual" />
+        </div>
+    </footer>--%>
+</form>
+    <script type="text/javascript">
+    function btnSalir() {
+        // Lógica para manejar la salida, por ejemplo, redirigir a otra página
+        window.location.href = '<%= ResolveUrl("~/Presentacion/Default.aspx") %>';
+    }
+    </script>
+
+</body>
+</html>

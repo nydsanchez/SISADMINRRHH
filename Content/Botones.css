@@ -1,0 +1,89 @@
+﻿.btn2 {
+    border: none; /*Quita los bordes asperos que tienen los botones por defecto*/
+    background-color: #2196F3;
+    margin: .5rem;
+    position: relative;
+    transform: rotateZ(360deg);
+    transition: all .2s ease;
+    overflow: hidden;
+    cursor: pointer;
+    width: 200px;
+    height: 100px;
+}
+
+.btn2-circle {
+    border-radius: 50%; /*Redondear bordes*/
+    width: 120px; /*Ancho del botón*/
+    height: 120px; /*Alto del botón*/
+    font-size: 26px;
+    box-shadow: 0 3px 5px rgba(0,0,0,.4);
+}
+
+    .btn2-circle:hover, .btn-circle:active {
+        box-shadow: 0 6px 10px rgba(0,0,0,.4);
+    }
+
+.btn2:hover {
+    box-shadow: 0 6px 10px rgba(0,0,0,.4);
+}
+
+.ripple-container {
+    /*Con los siguientes valores de position, top, left, width y height aseguramos que el div tome todo el tamaño de su padre*/
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: transparent;
+}
+
+.ripple-effect {
+    position: absolute;
+    /*En javascript colocaremos el top y left de este span en el punto donde hizo click el usuario. Por eso es necesario trasladarlo en -50% en ambos ejes, para que el centro del efecto coincida con el click*/
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255, 0.4);
+}
+
+.ripple-container.ripple-effect-animation .ripple-effect {
+    /*Aplicamos la animación que mas adelante definiremos con @keyframes*/
+    -webkit-animation: ripple .4s ease-in;
+    animation: ripple .4s ease-in;
+}
+
+@-webkit-keyframes ripple {
+    0% {
+        opacity: 0;
+    }
+
+    30% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        padding-bottom: 200%;
+        width: 200%;
+    }
+}
+
+@-webkit-keyframes ripple {
+    0% {
+        opacity: 0;
+    }
+
+    30% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        padding-bottom: 200%;
+        width: 200%;
+    }
+}
