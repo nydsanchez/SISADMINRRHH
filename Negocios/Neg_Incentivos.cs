@@ -19,7 +19,7 @@ namespace Negocios
         DataTable Ndt = new DataTable();
         DataTable Ndtc1 = new DataTable();
         DataTable Ndtc2 = new DataTable();
-
+        public const decimal MetaProduccionBase = 200m;
         public int idconstruccion = 0;
         public decimal dzpagar = 0;
         public DateTime fecha_producido = new DateTime();
@@ -3380,39 +3380,11 @@ namespace Negocios
                     eficienciaSemReal = default(decimal);
                     if (tablaincxconst != null && tablaincxconst.Length != 0)
                     {
-                        //***
-                        //  'tablaincxconst' es un DataTable
-                        //decimal docenasPeriodo = 10; // Valor del parámetro
-                        var filaValida = tablaincxconst.AsEnumerable()
-                            .Where(c => docenasperiodo >= c.Field<decimal>("dzdesde") && docenasperiodo <= c.Field<decimal>("dzhasta"))
-                            .FirstOrDefault();
-                        valor = 200;
-                        if (filaValida != null)
-                        {
-                            // Haz algo con 'filaValida', que es un DataRow
-                            valor = filaValida.Field<decimal>("metamaxDia");
-                            Console.WriteLine($"Valor obtenido: {valor}");
-                        }
-                        //else
-                        //{
-                        //    valor = 200;
-                        //    Console.WriteLine("No se encontró una fila válida en el rango especificado.");
-                        //}
-                        //decimal eficienciaSemTempo = Math.Round(docenasperiodo / ( valor * (decimal)dias) * 100m, 2);
-                        //***
-                        // tablainc = tablaincxconst.Where((DataRow c) => c.Field<decimal>("eficienciaDesde") <= dzEficiencia && c.Field<decimal>("eficienciaHasta") > dzEficiencia).ToArray();
-                        //TODO:VHPO
-
-                        // se cambio 05/12/2024
-
-                        //metamaxDia = tablaincxconst.Max((DataRow c) => c.Field<decimal>("dzdesde"));
-                        metamaxDia = valor; // 200;
+                                               
+                     
+                        metamaxDia = MetaProduccionBase;
                         eficienciaSem = Math.Round(docenasperiodo / (metamaxDia * (decimal)dias) * 100m, 2);
                         eficienciaSemReal = eficienciaSem;
-
-
-
-
                     }
 
                     factorDia = default(decimal);
@@ -3726,18 +3698,7 @@ namespace Negocios
                 if (tablaincxconst != null && tablaincxconst.Length != 0)
                 {
                     //TODO:VHPO
-                    metamaxSem = tablaincxconst.Max((DataRow c) => c.Field<decimal>("dzdesde"));
-
-                    /*DataRow meta100row = (from c in tablaincxconst.AsEnumerable()
-                      where c.Field<decimal>("eficienciaDesde") == 100m
-                      select c).FirstOrDefault();
-
-                    // 2. Extraer el valor de "dzdesde" de esa fila
-                    decimal metamaxSem;
-                    if (meta100row != null)
-                    {
-                        metamaxSem = meta100row.Field<decimal>("dzdesde");
-                    }*/
+                    metamaxSem = MetaProduccionBase;
                     eficienciaSem = Math.Round(docenasperiodo / (metamaxSem * (decimal)dias) * 100m, 2);
                     //REVISAR AQUI
                     if (eficienciaSem < 90m && areaModList != null && areaModList.Length != 0)
