@@ -992,14 +992,8 @@ namespace Negocios
                         emp.Produccion = produccion;
                         emp.Proceso = proceso;
                         emp.Meta = meta;
-/*prueba apara quitar el incentivo para if
-                        if (EO.Operacion.Trim().ToUpper() == "IF")
-                        {
-                            emp.Incentivo = IncentivoConAQL((incentivo / 5) * totaldiasTrab, modulo);
-                        }
-                        else
-                        {}*/
-                            emp.Incentivo = (incentivo / 5) * totaldiasTrab;
+
+                        emp.Incentivo = (incentivo / 5) * totaldiasTrab;
                         
                         emp.DiasLaborales = totaldiasTrab;
                         emp.DiasLaborados = NdiasL;
@@ -1097,14 +1091,7 @@ namespace Negocios
                     emp.Produccion = produccion;
                     emp.Proceso = proceso;
                     emp.Meta = meta;
-
-                  /*  if (EO.Operacion.Trim().ToUpper() == "IF")
-                    {
-                        emp.Incentivo = IncentivoConAQL((incentivo / 5) * totaldiasTrab, modulo);
-                    }
-                    else
-                    {}*/
-                        emp.Incentivo = (incentivo / 5) * totaldiasTrab;                    
+                    emp.Incentivo = (incentivo / 5) * totaldiasTrab;                    
                     emp.DiasLaborales = totaldiasTrab;
                     emp.DiasLaborados = NdiasL;
                     emp.DiasJustificados = NdiasJ;
@@ -1396,15 +1383,6 @@ namespace Negocios
 
                         }
 
-                        /*if (emp.Operacion.Trim().ToUpper() == "IF")
-                        {
-                            emp.Incentivo = IncentivoConAQL(decimal.Parse((((nuevoincentivo.Incentivo / 5) * (emp.MetasModulo))).ToString()), emp.Modulo);
-                        }
-                        else
-                        {
-                            emp.Incentivo = decimal.Parse((((nuevoincentivo.Incentivo / 5) * (emp.MetasModulo))).ToString());
-                        }*/
-
                         emp.Incentivo = decimal.Parse((((nuevoincentivo.Incentivo / 5) * (emp.MetasModulo))).ToString());
                         emp.DetalleEgreso = "";
                         emp.DetalleIngreso = "";
@@ -1649,8 +1627,6 @@ namespace Negocios
                                     {
                                         valorPor = Valor;
                                     }
-
-
                                 }
 
                                 //TIPO DE CALCULO ES NUMERICO
@@ -3422,6 +3398,46 @@ namespace Negocios
             }
         }
 
+
+        public static bool PlnPagoIncentivoCortes(DataTable dtcut, string comentario, string user)
+        {
+            using (SqlConnection conn = new CnBD().GetConecctionC())
+            {
+                try
+                {
+                    conn.Open();
+
+                    // Itera sobre cada fila del DataTable
+                    foreach (DataRow row in dtcut.Rows)
+                    {
+                        // Asegúrate de que los nombres de las columnas coincidan
+                        string corte = row["corte"].ToString();
+                        int seccion = Convert.ToInt32(row["seccion"].ToString());
+
+                        using (SqlCommand cmd = new SqlCommand("PlnPagoIncentivoCortesNLIns", conn))
+                        {
+                            cmd.CommandType = CommandType.StoredProcedure;
+
+                            // Usa AddWithValue para mayor simplicidad
+                            cmd.Parameters.AddWithValue("@corte", corte);
+                            cmd.Parameters.AddWithValue("@seccion", seccion);
+                            cmd.Parameters.AddWithValue("@comentario", comentario);
+                            cmd.Parameters.AddWithValue("@usuario", user);
+
+                            cmd.ExecuteNonQuery();
+                        }
+                    }
+                }
+                catch (SystemException)
+                {
+                    // Retorna false si ocurre un error en cualquier punto del bucle
+                    return false;
+                }
+            } // El bloque `using` cierra la conexión automáticamente
+
+            return true; // Retorna true si todo el bucle se completó sin errores
+        }
+
         public DataTable PlnObtenerOQLMod(int periodo, DateTime fechaini, DateTime fechafin)
         {
             DataTable dtOQLMod = new DataTable();
@@ -4224,10 +4240,7 @@ namespace Negocios
                         dzpt = Math.Round(diaprodxconst.Sum((DataRow r) => r.Field<decimal>("docenaspagar")), 2);//lo aprobado
                         dzpgprot = Math.Round(diaprodxconst.Sum((DataRow r) => r.Field<decimal>("docenaspagarprot")), 2);//lo aprobado mas lo protegido
                         montodz = Math.Round(diaprodxconst.Sum((DataRow r) => r.Field<decimal>("montodocenas")), 2);//lo aprobado protegido en dinero
-                        if (operacion.Trim().ToLower() == "if")
-                        {
-                            montodz *= 0.5m;
-                        }
+
                         DataRow[] empSimultaneo = empxdia.Where((DataRow c) => c.Field<int>("codigo_empleado") == codigo && c.Field<bool>("opera_simultaneo")).ToArray();
                         porcentaje_opera = (from x in empDiaMod
                                             where x.Field<int>("codigo_empleado") == codigo
@@ -4321,10 +4334,7 @@ namespace Negocios
                             dzpgprot_cut = Math.Round(Convert.ToDecimal(cut["docenaspagarprot"]), 2);
                             dzprotsec_cut = Math.Round(Convert.ToDecimal(cut["docenasprotxsec"]), 2);
                             montodocenas = Math.Round(Convert.ToDecimal(cut["montodocenas"]), 2);
-                            if (operacion.Trim().ToLower() == "if")
-                            {
-                                montodocenas *= 0.5m;
-                            }
+
                             if (conteo_operacion > layout && layout > 0m)
                             {
                                 montodocenas = Math.Round(montodocenas * layout / conteo_operacion, 2);
@@ -4894,27 +4904,7 @@ namespace Negocios
                             }
                         }
 
-                        if (operacion.Trim().ToUpper() == "IF")
-                        {
-                            //oqlmod
-                            //int Veces = 0;
-                            //if (codigo == 873675)
-                            //{
-                            //    Veces = 1;
-                            //}
-
-
-                            decimal montooql = PlnAsignarIngresoCumplimientoOQL(CumplimientoOQL, datoempR, existeSimultaneo);
-                            if (montooql > 0m)
-                            {
-                                montooql = Math.Round(montooql * (decimal)dias / 5m, 2) * diasperiodo / (decimal)dias;
-                                incentivorango += montooql;
-                                incentivo += montooql;
-                                dtInD.Rows.Add(codigo, 1, "PorcentajeOql", 1, montooql, montooql, "SISTEMA", rubroP, true);
-                            }
-                        }
-
-
+                       
                         excp = 0;
                         if (IngrDeducInc != null)
                         {

@@ -361,25 +361,14 @@ namespace NominaRRHH.Presentacion
                     }
                     else
                     {
-                        // fechaini = Convert.ToDateTime(dtPeriodo.Rows[0]["fechaini2"].ToString(), System.Globalization.CultureInfo.GetCultureInfo("en-Us").DateTimeFormat);
-                        //// Convert.ToDateTime(dtPeriodo.Rows[0]["fechaini2"].ToString());
-                        // fechafin = Convert.ToDateTime(dtPeriodo.Rows[0]["fechafin2"].ToString(), System.Globalization.CultureInfo.GetCultureInfo("en-Us").DateTimeFormat);
-                        // //Convert.ToDateTime(dtPeriodo.Rows[0]["fechafin2"].ToString());
-
+            
                         fechaini = Convert.ToDateTime(dtPeriodo.Rows[0]["fechaini2"].ToString());
                         fechafin = Convert.ToDateTime(dtPeriodo.Rows[0]["fechafin2"].ToString());
                     }
 
-
-
-
                     //PARAMETROS DE FECHAS NECESARIOS
 
-
                     #region SE OBTIENEN LAS LISTAS DE INCENTIVOS, LAS TABLAS DE PRODUCCION X MODULO Y LOS DATOS DE TODOS LOS EMPLEADOS
-
-
-
 
 
                     dsmodulo = Neg_Incentivos.obtenerModulos();
@@ -389,9 +378,6 @@ namespace NominaRRHH.Presentacion
 
                     li = Neg_Incentivos.IncentivosList();
                     Session["TABLAINCENTIVOS"] = li;
-
-                    //lt = Neg_Marca.ObtenerEmpleadosParaIncentivosP(fechaini, fechafin, 3, 1, userDetail.getIDEmpresa());
-                    //Session["EMPLEADOS"] = lt;
 
                     EmpleadosOP = Neg_Incentivos.EmpleadoOperacion();
                     Session["EMPLEADOSOP"] = EmpleadosOP;

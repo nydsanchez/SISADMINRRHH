@@ -159,6 +159,7 @@
                         </div>
                         <div class="col-md-2">
                             <asp:Button ID="BtnPrint" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Imprimir" OnClick="BtnPrint_Click" />
+                            <asp:Button ID="BtnAutorizarPagosPendientes" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes" OnClick="BtnAutorizarPagosPendientes_Click" />
                         </div>
 
 

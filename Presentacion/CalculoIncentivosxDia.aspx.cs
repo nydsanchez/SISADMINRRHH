@@ -256,6 +256,7 @@ namespace NominaRRHH.Presentacion
                 else
                 {
                     ImprimirIncentivoPend();
+                    BtnAutorizarPagosPendientes.Visible = true;
                 }
             }
             catch (Exception ex)
@@ -288,6 +289,33 @@ namespace NominaRRHH.Presentacion
             }
         }
 
+        protected void BtnAutorizarPagosPendientes_Click(object sender, EventArgs e)
+        {
+            DataTable dtcut = Session["INCENTIVOPENDIENTEMOD"] as DataTable;
+
+            string comentario = "Autorizado Calidad Interna";
+            string user = Convert.ToString(this.Page.Session["usuario"]);
+
+            // Verificar si el DataTable es nulo o vacío antes de llamar al método
+            if (dtcut != null && dtcut.Rows.Count > 0)
+            {
+               
+                if (Neg_Incentivos.PlnPagoIncentivoCortes(dtcut, comentario, user))
+                {
+                    alertSucces.Visible = true;
+                    LblSuccess.Visible = true;
+                    LblSuccess.Text = "Los cortes han sido cargados correctamente";
+                    dtcut.Clear();
+                    Session["INCENTIVOPENDIENTEMOD"] = dtcut;
+                }
+                else
+                {
+                    alertSucces.Visible = true;
+                    LblSuccess.Visible = true;
+                    LblSuccess.Text = "Error al insertar los registros";
+                }
+            }
+        }
         #endregion
 
         #region METODOS DE DATOS
