@@ -3,6 +3,7 @@ using System.Data;
 using Microsoft.Reporting.WebForms;
 using Negocios;
 using Datos;
+using System.Linq;
 
 namespace NominaRRHH.Presentacion
 {
@@ -120,7 +121,7 @@ namespace NominaRRHH.Presentacion
                 {
                     if (decimal.TryParse(txtBonoCalidad.Text, out BonoCalidad))
                     {
-                        new Dato_Incentivos().IncentivoIngDedccLOGInsert(1, codigo, periodo, 1, 1, "BonoCalidad", 1, BonoCalidad, BonoCalidad, "", 4, false);
+                        new Dato_Incentivos().IncentivoIngDedccLOGInsert(1, codigo, periodo, 1, 1, "OpCritica", 1, BonoCalidad, BonoCalidad, "", 38, false);
                     }
 
                     if (decimal.TryParse(txtAsistencia.Text, out asistencia))
@@ -169,6 +170,7 @@ namespace NominaRRHH.Presentacion
             try
             {
                 ObtenerDatosEmpleado();
+                operacionCt();
             }
             catch (Exception ex)
             {
@@ -227,6 +229,8 @@ namespace NominaRRHH.Presentacion
                 if (!string.IsNullOrEmpty(this.txtCodigo.Text.Trim()))
                 {
                     DataTable DetEmpleados = Neg_Empleados.ObtenerInfoDetEmpleado(txtCodigo.Text);
+                    Session["DetEmpleados"] = DetEmpleados;
+
                     DataTable ubicacion = Neg_Catalogos.seleccionarUbicacionesxCod(Convert.ToInt32(DetEmpleados.Rows[0]["codigo_ubicacion"]));
                     dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.cargarUltPeriodoAbieCat(1, Convert.ToInt32(ubicacion.Rows[0]["tplanilla"]), 0);
                     if (dtPeriodo.Rows.Count > 0)
@@ -237,7 +241,7 @@ namespace NominaRRHH.Presentacion
                     {
                         txtPeriodo.Text = "0";
                     }
-                    Session["periodo"] = txtPeriodo.Text.Trim();
+                    Session["periodo"] = txtPeriodo.Text.Trim();                   
                 }
 
             }
@@ -251,6 +255,7 @@ namespace NominaRRHH.Presentacion
 
         protected void btnConsultar_Click(object sender, EventArgs e)
         {
+            
             if (TxtPorcentaje.Text.Trim().Length > 0 && TxtEstilo.Text.Trim().Length > 0)
             {
                 int proteccion = int.Parse(TxtPorcentaje.Text.Trim());
@@ -259,12 +264,58 @@ namespace NominaRRHH.Presentacion
 
                 if (dt.Rows.Count > 0)
                 {
-                    txtBonoCalidad.Text = decimal.ToInt32((decimal)dt.Rows[0]["BonoCalidad"]).ToString();
+                  
                     txtAsistencia.Text = decimal.ToInt32((decimal)dt.Rows[0]["BonoAsistencia"]).ToString();
                     txtViatico.Text = decimal.ToInt32((decimal)dt.Rows[0]["Incentivo"]).ToString();
                 }
+
+               string bandera = operacionCt();                  
+                
+                if (bandera != "NoBono")
+                {
+                    DataTable dtOpC = Neg_Incentivos.PlnTablaOperacionCriticaSel();
+                   var row = dtOpC.AsEnumerable()
+                       .FirstOrDefault(r => proteccion >= r.Field<decimal>("eficienciadesde")
+                                   && proteccion <= r.Field<decimal>("eficienciahasta"));
+
+                    decimal monto = row != null ? row.Field<decimal>("montoOpCritica") : 0;
+
+                    txtBonoCalidad.Text = decimal.ToInt32(monto).ToString();
+                }
+
             }
         }
+
+        string operacionCt()
+        {
+            DataTable DetEmpleados = Neg_Empleados.ObtenerInfoDetEmpleado(txtCodigo.Text);
+            Session["DetEmpleados"] = DetEmpleados;
+
+            if (Session["DetEmpleados"] != null)
+            {
+                DataTable dt = Session["DetEmpleados"] as DataTable;
+
+                if (dt.Rows.Count > 0)
+                {
+                    string idOperacion = dt.Rows[0]["idOperacion"].ToString().Trim();
+
+                    // Si idOperacion NO está en la lista permitida → deshabilita
+                    if (idOperacion != "PM" && idOperacion != "PC" &&
+                        idOperacion != "PT" && idOperacion != "RF" &&
+                        idOperacion != "UH")
+                    {
+                        txtBonoCalidad.Enabled = false;
+                        return "NoBono";
+                    }
+                    else
+                    {
+                        txtBonoCalidad.Enabled = true;
+                    }
+                }
+            }
+            return "Ok";
+        }
+    
     }
 
 }

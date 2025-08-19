@@ -49,7 +49,7 @@
                                         </div>
 
                                         <div class="col-md-2">
-                                            <label class="control-label" for="focusedInput">Bono Calidad</label>
+                                            <label class="control-label" for="focusedInput">Operación Critica</label>
                                             <asp:TextBox ID="txtBonoCalidad" class="form-control"
                                                 runat="server" autocomplete="off" onkeypress="return soloNumeros(event)"></asp:TextBox>
                                         </div>
