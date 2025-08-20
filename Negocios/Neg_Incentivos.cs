@@ -4892,6 +4892,7 @@ namespace Negocios
                                                   select c).ToArray();
                                 excp = ingdeducexcept.Length;
                             }
+                            //revisar para OPC
                             if (excp == 0 && diasperiodo >= (decimal)dias)
                             {
                                 decimal montoOpC = PlnAsignarIngresoOpCritica(semanaProd, tablainc, dzEficiencia, operacion);

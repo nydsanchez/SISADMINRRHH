@@ -289,6 +289,7 @@ namespace NominaRRHH.Presentacion
             }
         }
 
+        // Elimina paso de cargar cortes pendientes de pago en el KRP 
         protected void BtnAutorizarPagosPendientes_Click(object sender, EventArgs e)
         {
             DataTable dtcut = Session["INCENTIVOPENDIENTEMOD"] as DataTable;
@@ -316,6 +317,12 @@ namespace NominaRRHH.Presentacion
                 }
             }
         }
+        //aplicar bono de operacion critica
+        protected void BtnAplicarBonoOperacionCritica_Click(object sender, EventArgs e)
+        {
+
+        }
+
         #endregion
 
         #region METODOS DE DATOS
@@ -361,6 +368,7 @@ namespace NominaRRHH.Presentacion
                 div4.Visible = false;
                 div6.Visible = false;
                 divrpt.Visible = true;
+                BtnAutorizarPagosPendientes.Visible = false;
 
                 DataTable dt = Session["INCENTIVOTOTAL"] as DataTable;
                 var sortdt = dt.AsEnumerable().OrderBy(c => c.Field<string>("modulo")).ThenBy(c => c.Field<int>("codigo_empleado")).CopyToDataTable();
@@ -524,7 +532,6 @@ namespace NominaRRHH.Presentacion
             }
         }
 
-
         void ObtenerTablaEficiencia(DateTime ini, DateTime fin, DateTime corteaprobacion, int periodo, int semana)
         {
             try
@@ -559,7 +566,6 @@ namespace NominaRRHH.Presentacion
                 throw new Exception(ex.Message);
             }
         }
-
 
         void procesoModulos(DateTime ini, DateTime fin, DateTime corteaprobacion, int periodo)
         {
@@ -643,10 +649,6 @@ namespace NominaRRHH.Presentacion
         {
             try
             {
-
-                //if (Session["INCENTIVOTOTAL"] != null)
-                //{
-                //obtener produccion directa de rango de fecha,solo para bono de asistencia
                 DataTable dtmod = Neg_Incentivos.plnObtenerProdAPagarxMod(ini, fin, fechaaprobacion, 3, periodo).Tables[1];
                 Session["INCENTIVOPENDIENTEMOD"] = dtmod;
                 DataTable inc = new DataTable();
@@ -659,11 +661,9 @@ namespace NominaRRHH.Presentacion
                     inc = detpend.Tables[1];
                     Session["INCENTIVOPENDIENTECUT"] = inc;
                 }
-
             }
             catch (Exception ex)
             {
-
                 throw new Exception(ex.Message);
             }
         }
@@ -725,13 +725,26 @@ namespace NominaRRHH.Presentacion
             div3.Visible = false;
             div4.Visible = false;
             div6.Visible = true;
-            var sortdt = dtcut.AsEnumerable().OrderBy(c => c.Field<string>("modulo"))
-            .CopyToDataTable();
-            cargarReporte(sortdt, 6, ReportViewer5);
+
+            if (dtcut != null && dtcut.Rows.Count > 0)
+            {
+                var sortdt = dtcut.AsEnumerable().OrderBy(c => c.Field<string>("modulo"))
+                            .CopyToDataTable();
+                            cargarReporte(sortdt, 6, ReportViewer5);
+                BtnAutorizarPagosPendientes.Visible = true;
+            }
+            else
+            {
+                alertSucces.Visible = true;
+                LblSuccess.Visible = true;
+                LblSuccess.Text = "No hay cortes con pagos pendientes";
+            }
+                
         }
 
         void ImprimirDetalleModulo()
         {
+            BtnAutorizarPagosPendientes.Visible = false;
             DataTable dtcut = new DataTable();
             dtcut = Session["INCENTIVOCUT"] as DataTable;
             div1.Visible = true;
@@ -753,6 +766,7 @@ namespace NominaRRHH.Presentacion
             div3.Visible = false;
             div4.Visible = false;
             div6.Visible = false;
+            BtnAutorizarPagosPendientes.Visible = false;
 
             DataTable dtcump = new DataTable();
             dtcump = Session["eficienciaMod"] as DataTable;
@@ -786,6 +800,7 @@ namespace NominaRRHH.Presentacion
         }
         void ImprimirDetalleEmpleados()
         {
+            BtnAutorizarPagosPendientes.Visible = false;
             if (Session["INCENTIVOCUT"] != null)
             {
                 if (Session["INCENTIVOSDIARIO"] != null)
@@ -811,6 +826,7 @@ namespace NominaRRHH.Presentacion
         }
         void ImprimirIncentivoTotal()
         {
+            BtnAutorizarPagosPendientes.Visible = false;
             if (Session["INCENTIVOTOTAL"] != null)
             {
                 div1.Visible = false;

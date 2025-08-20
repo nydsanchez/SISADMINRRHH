@@ -120,11 +120,7 @@
 
                                     <div class="col-md-3">
                                         <asp:Button ID="Button2" Class="btn btn-success" runat="server" Text="Mostrar Reporte" OnClick="Button2_Click" />
-
-
                                     </div>
-
-
                                 </div>
                                 <div class="row" runat="server" id="div2">
 

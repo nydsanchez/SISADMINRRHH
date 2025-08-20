@@ -22,7 +22,7 @@
                     <button type="button" class="close" data-dismiss="alert">×</button>
                     <asp:Label ID="LblSuccess" runat="server" Visible="false"></asp:Label>
                 </div>
-                <div class="row">                    
+                <div class="row">
                     <div class="col-md-2">
                         <label class="control-label" for="focusedInput">Corte Aprobacion</label>
                         <div class="input-group input-append date" id="datePicker3">
@@ -37,10 +37,10 @@
                         <asp:TextBox ID="txtPeriodo" class="form-control" placeholder="Digite un Periodo" AutoPostBack="true" OnTextChanged="txtPeriodo_TextChanged"
                             runat="server" autocomplete="off"></asp:TextBox>
                     </div>
-                <div class="col-md-2">
-                <asp:Label class="control-label" for="focusedInput" ID="Label4" runat="server" Text="Dias a Pagar" Style="font-weight: 700"></asp:Label>
-                <asp:TextBox ID="txtDiasaPagar" class="form-control" placeholder="Dias a Pagar" Text="5" runat="server" autocomplete="off"></asp:TextBox>
-                </div>  
+                    <div class="col-md-2">
+                        <asp:Label class="control-label" for="focusedInput" ID="Label4" runat="server" Text="Dias a Pagar" Style="font-weight: 700"></asp:Label>
+                        <asp:TextBox ID="txtDiasaPagar" class="form-control" placeholder="Dias a Pagar" Text="5" runat="server" autocomplete="off"></asp:TextBox>
+                    </div>
                     <div class="col-md-1">
                         <asp:Label class="control-label" for="focusedInput" ID="lblSemana" runat="server" Text="Semana" Style="font-weight: 700" Visible="False"></asp:Label>
                         <asp:DropDownList class="form-control" ID="ddlTipo" runat="server" Visible="False">
@@ -49,19 +49,18 @@
                         </asp:DropDownList>
                     </div>
 
-
                 </div>
                 <br>
                 <div class="row">
 
-                
+
                     <div class="col-md-3" runat="server" id="divGen" visible="false">
-                       <asp:Button ID="BtnGenerar" Class="btn btn-success" runat="server" Text="Generar" OnClick="BtnGenerar_Click" />
+                        <asp:Button ID="BtnGenerar" Class="btn btn-success" runat="server" Text="Generar" OnClick="BtnGenerar_Click" />
                     </div>
                     <div class="col-md-3" runat="server" id="divApl" visible="false">
                         <asp:Button ID="btAlicarPlanilla" Class="btn btn-success" runat="server" Text="Aplicar" OnClick="btAlicarPlanilla_Click" />
                     </div>
-                        <div class="col-md-3">
+                    <div class="col-md-3">
                         <asp:Button ID="BtnConsultar1" Class="btn btn-success" runat="server" Text="Consultar" OnClick="BtnConsultar1_Click" />
                     </div>
                 </div>
@@ -104,12 +103,8 @@
                                     <SortedDescendingCellStyle BackColor="#CAC9C9" />
                                     <SortedDescendingHeaderStyle BackColor="#000065" />
                                 </asp:GridView>
-
-
                             </div>
                         </div>
-
-
 
                     </div>
                 </asp:Panel>
@@ -137,35 +132,35 @@
                         </div>
                     </div>
 
-
-
                 </div>
                 <div class="row" runat="server" id="divrpt" visible="false">
                     <div class="col-md-12 paddingContentTabs">
-
-
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <label class="control-label" for="focusedInput">Reporteria:</label>
+                        </div>
+                        <div class="col-md-3">                            
                             <asp:DropDownList class="form-control" ID="ddlReporteria" runat="server">
                                 <asp:ListItem Value="1">Detalle Modulos</asp:ListItem>
-                                 <asp:ListItem Value="5">Cumplimiento Semanal</asp:ListItem>
-                                    <asp:ListItem Value="3" Selected="True">Incentivo Total</asp:ListItem>
-                                  <asp:ListItem Value="4">Incentivo Pend.</asp:ListItem>
+                                <asp:ListItem Value="5">Cumplimiento Semanal</asp:ListItem>
+                                <asp:ListItem Value="3" Selected="True">Incentivo Total</asp:ListItem>
+                                <asp:ListItem Value="4">Incentivo Pend.</asp:ListItem>
                                 <asp:ListItem Value="2">Detalle Empleados</asp:ListItem>
-                            
-                              
-                               
+                                <asp:ListItem Value="6">Operación Critica</asp:ListItem>
                             </asp:DropDownList>
                         </div>
                         <div class="col-md-2">
                             <asp:Button ID="BtnPrint" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Imprimir" OnClick="BtnPrint_Click" />
-                            <asp:Button ID="BtnAutorizarPagosPendientes" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes" OnClick="BtnAutorizarPagosPendientes_Click" />
+
                         </div>
-
-
+                        <div class="col-md-2">
+                            <asp:Button ID="BtnAutorizarPagosPendientes" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes" OnClick="BtnAutorizarPagosPendientes_Click" />
+                        </div>
+                         <div class="col-md-2">
+                            <asp:Button ID="BtnAplicarBonoOperacionCritica" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes" OnClick="BtnAplicarBonoOperacionCritica_Click" />
+                        </div>
                     </div>
                 </div>
-                              
+
                 <div class="row" runat="server" id="div5" visible="false">
                     <div class="col-md-12 paddingContentTabs">
                         <div class="col-md-2">
@@ -180,10 +175,8 @@
                         </div>
                     </div>
                 </div>
-            
 
             </div>
-
 
             <br />
             <div class="row" visible="false" runat="server" id="div1">
@@ -221,7 +214,7 @@
 
     <script type="text/javascript">
 
-        $(function () {            
+        $(function () {
 
             $('#datePicker3').datepicker({
                 format: 'dd/mm/yyyy'
