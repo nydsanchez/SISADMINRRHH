@@ -20,6 +20,7 @@ namespace Negocios
         DataTable Ndtc1 = new DataTable();
         DataTable Ndtc2 = new DataTable();
         public const decimal MetaProduccionBase = 200m;
+       
         public int idconstruccion = 0;
         public decimal dzpagar = 0;
         public DateTime fecha_producido = new DateTime();
@@ -1409,7 +1410,7 @@ namespace Negocios
                            emp.Incentivo = decimal.Parse((((nuevoincentivo.Incentivo / 5) * (emp.MetasModulo))).ToString());
                        }
 
-                        emp.Incentivo = decimal.Parse((((nuevoincentivo.Incentivo / 5) * (emp.MetasModulo))).ToString());
+                        //emp.Incentivo = decimal.Parse((((nuevoincentivo.Incentivo / 5) * (emp.MetasModulo))).ToString());
                         emp.DetalleEgreso = "";
                         emp.DetalleIngreso = "";
                         IngresosDeduccion(emp, param, ingresoNumero, deduccionnumerico, ingresoporcentual, deduccionporcentual);
@@ -3299,7 +3300,7 @@ namespace Negocios
             decimal docenasprodAdic = default(decimal);
             decimal docenasprodCump = default(decimal);
             decimal docenasPermitidas = default(decimal);
-            int dias = 0;
+            decimal dias = 0;
             DataRow[] datoModR = null;
             DataRow[] semanaProd = null;
             DataRow[] datoModPend = null;
@@ -3382,9 +3383,35 @@ namespace Negocios
                     eficienciaSemReal = default(decimal);
                     if (tablaincxconst != null && tablaincxconst.Length != 0)
                     {
-                                               
-                     
-                        metamaxDia = MetaProduccionBase;
+                        //***
+                        //  'tablaincxconst' es un DataTable
+                        //decimal docenasPeriodo = 10; // Valor del parámetro
+                        var filaValida = tablaincxconst.AsEnumerable()
+                            .Where(c => docenasperiodo >= c.Field<decimal>("dzdesde") && docenasperiodo <= c.Field<decimal>("dzhasta"))
+                            .FirstOrDefault();
+                        valor = 200;
+                        if (filaValida != null)
+                        {
+                            // Haz algo con 'filaValida', que es un DataRow
+                            valor = filaValida.Field<decimal>("metamaxDia");
+                            Console.WriteLine($"Valor obtenido: {valor}");
+                        }
+                        //else
+                        //{
+                        //    valor = 200;
+                        //    Console.WriteLine("No se encontró una fila válida en el rango especificado.");
+                        //}
+                        //decimal eficienciaSemTempo = Math.Round(docenasperiodo / ( valor * (decimal)dias) * 100m, 2);
+                        //***
+                        // tablainc = tablaincxconst.Where((DataRow c) => c.Field<decimal>("eficienciaDesde") <= dzEficiencia && c.Field<decimal>("eficienciaHasta") > dzEficiencia).ToArray();
+                        //TODO:VHPO
+
+                        // se cambio 05/12/2024
+
+                        //metamaxDia = tablaincxconst.Max((DataRow c) => c.Field<decimal>("dzdesde"));
+                        metamaxDia = valor; // 200;                     
+
+                       // metamaxDia = MetaProduccionBase;
                         eficienciaSem = Math.Round(docenasperiodo / (metamaxDia * (decimal)dias) * 100m, 2);
                         eficienciaSemReal = eficienciaSem;
                     }
@@ -3737,9 +3764,22 @@ namespace Negocios
                 if (tablaincxconst != null && tablaincxconst.Length != 0)
                 {
                     //TODO:VHPO
-                    metamaxSem = MetaProduccionBase;
+                    
+                     metamaxSem = tablaincxconst.Max((DataRow c) => c.Field<decimal>("dzdesde"));
+                    /*    
+                        var fila = tablaincxconst.FirstOrDefault(c => c.Field<decimal>("eficienciadesde") == 100);
+                        decimal meta5 = fila != null ? fila.Field<decimal>("meta5") : 1000m;       
+                        decimal metasemanal = (dias / 5m) * meta5; 
+                    
+                        eficienciaSem = Math.Round ((metasemanal / docenasperiodo) * 100);
+
+                        //hacer condicion de pagar o no bonoasistencia si asistencia >= (48m - 0.5) && eficienciasemana > 90 buscar la tabla y mandar el bono de asistencia
+                        o retornar buscar la fila que coincida con la eficiencia
+                     */
+
+
                     eficienciaSem = Math.Round(docenasperiodo / (metamaxSem * (decimal)dias) * 100m, 2);
-                    //REVISAR AQUI
+                    
                     if (eficienciaSem < 90m && areaModList != null && areaModList.Length != 0)
                     {
                         tablaincxconst = (from c in li.AsEnumerable()
@@ -3747,7 +3787,7 @@ namespace Negocios
                                           select c).ToArray();
                     }
                 }
-                return tablaincxconst;
+                return tablaincxconst; 
             }
             catch (Exception ex)
             {
@@ -3929,16 +3969,7 @@ namespace Negocios
                                     tablainc = PlnObtenerTablaIncentivo(prodxdia, 2, 2, 0, modulo, totalprodxdia);
                                     metadia100 = tablainc.Max((DataRow c) => c.Field<decimal>("dzdesde"));
 
-                                    /*DataRow meta100row = (from c in tablaincxconst.AsEnumerable()
-                                        where c.Field<decimal>("eficienciaDesde") == 100m
-                                            select c).FirstOrDefault();
-
-                                    // 2. Extraer el valor de "dzdesde" de esa fila
-                                    decimal metamaxSem;
-                                    if (meta100row != null)
-                                    {
-                                        metamaxSem = meta100row.Field<decimal>("dzdesde");
-                                    }*/
+                                   
                                 }
                                 proteccionxmod = (from c in prot.AsEnumerable()
                                                   where c.Field<DateTime>("fecha") == fc && c.Field<string>("modulo").Trim() == modulo
@@ -4917,6 +4948,22 @@ namespace Negocios
                                 // old code
                                 //bonoasistencia = Math.Round(tablainc.Max((DataRow c) => c.Field<decimal>("bonoasist")) * (decimal)dias / 5m, 2);
                                 bonoasistencia = Math.Round(valorBono * (decimal)dias / 5m, 2);
+
+                                /*var filaBono = tablaincX
+                                .FirstOrDefault(c => eficienciaSem >= c.Field<decimal>("eficienciadesde")
+                                                  && eficienciaSem <= c.Field<decimal>("eficienciahasta"));
+
+                            bool asistenciaPerfecta = horasemlab >= (horasperiodo - 0.5m); // máximo 30 min perdidos
+
+                            if (empincfijo.Length == 0 && filaBono != null && asistenciaPerfecta)
+                            {
+                                // Bono completo
+                                bonoasistencia = filaBono.Field<decimal>("bonoasist");
+                            }
+                            else
+                            {
+                                bonoasistencia = 0m; // no aplica bono
+                            }*/
                             }
                             if (IngrDeducInc != null)
                             {
@@ -4926,6 +4973,14 @@ namespace Negocios
                                 excp = ingdeducexcept.Length;
                             }
                             //revisar para OPC
+
+                            /*
+                             condicion para las OpC
+                            - operaciones: PM, PC, PT, RF y UH
+                            - eficiencia >= 90%
+                            - asistencia perfecta
+                            - layout completo
+                             */
                             if (excp == 0 && diasperiodo >= (decimal)dias)
                             {
                                 decimal montoOpC = PlnAsignarIngresoOpCritica(semanaProd, tablainc, dzEficiencia, operacion);
@@ -5126,6 +5181,12 @@ namespace Negocios
 
         private int[] ObtenerAsociadosIncentivoTotal(DataTable dprod, DataTable dpg, DataTable dprot, DataTable ding)
         {
+            // Initialize empty DataTables to prevent NullReferenceException
+            dprod = dprod ?? new DataTable();
+            dpg = dpg ?? new DataTable();
+            dprot = dprot ?? new DataTable();
+            ding = ding ?? new DataTable();
+
             int[] codigos = null;
             int[] lista1 = null;
             int[] lista2 = null;

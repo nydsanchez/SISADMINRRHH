@@ -2372,6 +2372,7 @@ namespace Negocios
                 decimal dzmenos = default(decimal);
                 decimal amonestaciones = default(decimal);
                 decimal hes = default(decimal);
+                decimal bonocalidad = default(decimal); 
                 decimal bonoOperCrit = default(decimal); //cambiar por operacion critica
                 decimal bonoviernes = default(decimal);
 
@@ -2417,6 +2418,7 @@ namespace Negocios
                         empleadoreg = (from c in empleadoingdeduc.AsEnumerable()
                                        where c.Field<int>("tipo") == 1 && c.Field<string>("detalle") == "BonoCalidad"
                                        select c).ToArray();
+                        bonocalidad = empleadoreg.Sum((DataRow c) => c.Field<decimal>("valor"));
                         empleadoreg = (from c in empleadoingdeduc.AsEnumerable()
                                        where c.Field<int>("tipo") == 1 && c.Field<string>("detalle") == "OpCriticaYTransporte"
                                        select c).ToArray();
@@ -2443,7 +2445,7 @@ namespace Negocios
                         html = html + "</td><td COLSPAN='3'>" + dr1["operacion"].ToString() + "</td><td COLSPAN='3'>" + hrst + "</td><td COLSPAN='3'>" + ((int)((decimal)dr1["dzpagar"]));
                         html = html + "</td><td COLSPAN='3'>" + dr1["amonestaciones"].ToString() + "</td><td COLSPAN='3'>" + decimal.ToInt32(((decimal)dr1["incentivo"])).ToString();
                         html = html + "</td><td COLSPAN='3' align='right'>" + decimal.ToInt32(((decimal)dr1["bonoasistencia"])).ToString() + "</td><td COLSPAN='3' align='right'>" + ((int)bonoviernes);
-                        html = html + "</td><td COLSPAN='3' align='right'>" + ((int)dzadicional) + "</td><td COLSPAN='3' align='right'>" + ((int)bonoOperCrit);
+                        html = html + "</td><td COLSPAN='3' align='right'>" + ((int)dzadicional) + "</td><td COLSPAN='3' align='right'>" + ((int)bonocalidad);//cambiar por bonOperCrit
                         html = html + "</td><td COLSPAN='3' align='right'>" + amonestaciones + "</td><td COLSPAN='3'>" + hes + "</td><td COLSPAN='3' align='right'>" + dzmenos;
                         html = html + "</td><td COLSPAN='3' align='right'>" + decimal.ToInt32(((decimal)dr1["TotalIncentivo"])).ToString() + "</td></tr>";
                     }

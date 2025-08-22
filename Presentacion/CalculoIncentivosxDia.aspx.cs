@@ -54,7 +54,8 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+               // lblAlert.Text = ex.Message;
+                lblAlert.Text =  ex.ToString();
             }
         }
         protected void BtnGenerar_Click(object sender, EventArgs e)
@@ -72,23 +73,20 @@ namespace NominaRRHH.Presentacion
 
                 GenerarPlanillaIncentivo(1);
                 int periodo = Convert.ToInt32(txtPeriodo.Text);
-
                 int semana = Convert.ToInt32(Session["semana"]);
                 GuardarRegistrosGenerados(periodo, semana);
-
-
             }
             catch (Exception ex)
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
 
         }
         protected void BtnIncentivoTotal_Click(object sender, EventArgs e)
         {
-
             try
             {
                 ImprimirIncentivoTotal();
@@ -97,7 +95,8 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
         }
         protected void BtnConsultar2_Click(object sender, EventArgs e)
@@ -128,16 +127,14 @@ namespace NominaRRHH.Presentacion
 
                         cargarReporte(sortdt, 4, ReportViewer4);
                     }
-
                 }
-
-
             }
             catch (Exception ex)
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
 
         }
@@ -145,15 +142,14 @@ namespace NominaRRHH.Presentacion
         {
             try
             {
-
                 ImprimirDetalleModulo();
-
             }
             catch (Exception ex)
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
         }
         protected void ChkCargarProtecciones_CheckedChanged(object sender, EventArgs e)
@@ -179,7 +175,8 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
         }
         protected void btAlicarPlanilla_Click(object sender, EventArgs e)
@@ -263,7 +260,8 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
         }
         protected void BtnProcesar_Click(object sender, EventArgs e)
@@ -285,7 +283,8 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
         }
 
@@ -318,10 +317,10 @@ namespace NominaRRHH.Presentacion
             }
         }
         //aplicar bono de operacion critica
-        protected void BtnAplicarBonoOperacionCritica_Click(object sender, EventArgs e)
+       /* protected void BtnAplicarBonoOperacionCritica_Click(object sender, EventArgs e)
         {
 
-        }
+        }*/
 
         #endregion
 
@@ -352,7 +351,6 @@ namespace NominaRRHH.Presentacion
                 procesoModulos(ini, fin, fechaaprobacion, periodo);
                 procesoEmpleado(periodo);
                 ObtenerIncentivoPendPago(ini, fin, fechaaprobacion, periodo, semana);
-
                 procesoConsolidadoInc(calculo, ini, fin, periodo, semana);
 
                 divApl.Visible = true;
@@ -379,14 +377,16 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                //lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
+                throw;
+
             }
         }
         void GuardarRegistrosGenerados(int periodo, int semana)
         {
             try
             {
-
                 DataTable dt = Session["INCENTIVOTOTAL"] as DataTable;
 
                 #region proceso generar
@@ -496,7 +496,8 @@ namespace NominaRRHH.Presentacion
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                //throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -528,7 +529,8 @@ namespace NominaRRHH.Presentacion
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                //throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -547,7 +549,8 @@ namespace NominaRRHH.Presentacion
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                //throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
             }
         }
         void ObtenerOQLxModulo(int periodo, DateTime inicio, DateTime final)
@@ -563,7 +566,8 @@ namespace NominaRRHH.Presentacion
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                //throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -582,7 +586,8 @@ namespace NominaRRHH.Presentacion
             {
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
-                lblAlert.Text = ex.Message;
+                // lblAlert.Text = ex.Message;
+                lblAlert.Text = ex.ToString();
             }
         }
         void procesoEmpleado(int periodo)
@@ -627,22 +632,25 @@ namespace NominaRRHH.Presentacion
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                //throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
             }
         }
         void procesoConsolidadoInc(int calculo, DateTime ini, DateTime fin, int periodo, int semana)
         {
             try
             {
+                
                 if (Session["INCENTIVOSDIARIO"] != null)
-                {
-                    DataTable dt = Neg_Incentivos.ObtenerIncentivoTotal(ini, fin, periodo, semana, calculo);
-                    Session["INCENTIVOTOTAL"] = dt;
-                }
+                 {
+                     DataTable dt = Neg_Incentivos.ObtenerIncentivoTotal(ini, fin, periodo, semana, calculo);
+                     Session["INCENTIVOTOTAL"] = dt;
+                 }
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
+
             }
         }
         void ObtenerIncentivoPendPago(DateTime ini, DateTime fin, DateTime fechaaprobacion, int periodo, int semana)
@@ -664,7 +672,8 @@ namespace NominaRRHH.Presentacion
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.Message);
+                //throw new Exception(ex.Message);
+                throw new Exception(ex.ToString());
             }
         }
         public void ObtenerFechasPeriodo(int periodo, int semana)
