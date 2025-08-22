@@ -156,7 +156,7 @@
                             <asp:Button ID="BtnAutorizarPagosPendientes" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes" OnClick="BtnAutorizarPagosPendientes_Click" />
                         </div>
                          <div class="col-md-2">
-                            <asp:Button ID="BtnAplicarBonoOperacionCritica" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes"  />
+                            <asp:Button ID="BtnAplicarBonoOperacionCritica" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Aplicar OpC" visible="false" />
 
                              <%--OnClick="BtnAplicarBonoOperacionCritica_Click"--%>
                         </div>
