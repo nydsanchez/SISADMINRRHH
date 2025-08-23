@@ -5418,8 +5418,6 @@ namespace Negocios
                     {
                         id = 30;
                     }
-
-
                 }
                 else if (rubro == 2)
                 {

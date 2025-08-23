@@ -4,6 +4,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Data;
+using OfficeOpenXml;
 using System.Configuration;
 using System.Data.SqlClient;
 using Microsoft.Reporting.WebForms;
@@ -28,19 +29,17 @@ namespace NominaRRHH
         Neg_DevYDed NDevyDed = new Neg_DevYDed();
         #endregion
 
-
         DataTable dtDD = new DataTable();
         DataTable dtID = new DataTable();
-   
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
-            {              
-                Session["dtcargado"] = "";            
+            {
+                Session["dtcargado"] = "";
                 panelinc.Visible = false;
                 Button1.Visible = false;
             }
-
         }
 
         protected void Button1_Click(object sender, EventArgs e)
@@ -50,19 +49,15 @@ namespace NominaRRHH
                 if (txtPeriodo.Text.Trim() == "0" || txtPeriodo.Text.Trim() == "")
                     throw new Exception("Periodo Invalido");
 
-
                 dsPlanilla.dtPeriodoDataTable dtPeriodo = Neg_Periodo.PeriodoSel(Convert.ToInt32(txtPeriodo.Text));
-                //if (dtPeriodo[0].cerrado == 1)
-                //    throw new Exception("El periodo esta cerrado");
 
                 string user = Convert.ToString(this.Page.Session["usuario"]);
 
                 if (gvING.Rows.Count > 0)
                 {
-
                     IUserDetail userDetail = UserDetailResolver.getUserDetail();
 
-                    int periodo = int.Parse(txtPeriodo.Text);                    
+                    int periodo = int.Parse(txtPeriodo.Text);
                     int semana = int.Parse(ddlTipo.SelectedValue);
 
                     int codigo = 0;
@@ -83,11 +78,7 @@ namespace NominaRRHH
                     alertSucces.Visible = true;
                     LblSuccess.Visible = true;
                     LblSuccess.Text = "Los registros se han insertado exitosamente.";
-
-
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -95,34 +86,27 @@ namespace NominaRRHH
                 lblAlert.Visible = true;
                 lblAlert.Text = ex.Message;
             }
-        } //aqui fin
-
-     
+        } //aqui fin     
         protected void btnCargarID_Click(object sender, EventArgs e)
         {
             if (txtPeriodo.Text != "")
             {
-          
-                    if (fuIngr.HasFile)
-                    {
-
-                        Button1.Visible = true;
-                        CargarArchivo("fuIngr", "NG", "gvING");
-                    }
-                    else
-                    {
-                        alertValida.Visible = true;
-                        lblAlert.Visible = true;
-                        lblAlert.Text = "Favor Seleccione un archivo";
-                        fuIngr.Focus();
-                    }
-           
+                if (fuIngr.HasFile)
+                {
+                    Button1.Visible = true;
+                    CargarArchivo("fuIngr", "NG", "gvING");
+                }
+                else
+                {
+                    alertValida.Visible = true;
+                    lblAlert.Visible = true;
+                    lblAlert.Text = "Favor Seleccione un archivo";
+                    fuIngr.Focus();
+                }
             }
 
             else
             {
-
-
                 alertValida.Visible = true;
                 lblAlert.Visible = true;
                 lblAlert.Text = "Favor Ingrese un Periodo";
@@ -134,6 +118,8 @@ namespace NominaRRHH
 
         public void CargarArchivo(string nameFU, string NombreVS, string nombreGV)
         {
+            // Configurar licencia de EPPlus
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
             ContentPlaceHolder cph = (ContentPlaceHolder)Master.FindControl("MainContent");
             FileUpload FU = (FileUpload)cph.FindControl(nameFU);
@@ -141,91 +127,70 @@ namespace NominaRRHH
 
             if (FU.HasFile)
             {
-
-                string connectionString = "";
                 string fileName = Path.GetFileName(FU.PostedFile.FileName);
-                string fileExtension = Path.GetExtension(FU.PostedFile.FileName);
-                string fileLocation = HttpContext.Current.Server.MapPath("..").ToString() + @"\Trash\" + fileName;
+                string fileLocation = HttpContext.Current.Server.MapPath("..") + @"\Trash\" + fileName;
                 FU.SaveAs(fileLocation);
 
-
-                if (fileExtension == ".xls")
-                {
-                    connectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + fileLocation + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=2\"";
-                }
-                else if (fileExtension == ".xlsx")
-                {
-                    connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + fileLocation + ";Extended Properties=\"Excel 12.0;HDR=Yes;IMEX=2\"";
-                }
-
-
-
-                //Create OleDB Connection and OleDb Command
-                OleDbConnection con = new OleDbConnection(connectionString);
-                OleDbCommand cmd = new OleDbCommand();
-
-
-                cmd.CommandType = System.Data.CommandType.Text;
-                cmd.Connection = con;
-
-                OleDbDataAdapter dAdapter = new OleDbDataAdapter(cmd);
-
-                con.Open();
-
-                DataTable dtExcelSheetName = con.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-
-                string getExcelSheetName = dtExcelSheetName.Rows[0]["Table_Name"].ToString();
-                cmd.CommandText = "SELECT * FROM [" + getExcelSheetName + "]";
-                dAdapter.SelectCommand = cmd;
-                dAdapter.Fill(dtDD);
-                con.Close();
-
-
-
+                // Creamos DataTable
+                dtID.Columns.Clear();
                 dtID.Columns.Add("codigo");
                 dtID.Columns.Add("tipo");
                 dtID.Columns.Add("detalle");
                 dtID.Columns.Add("cantidad");
                 dtID.Columns.Add("valor");
-              
-                bool Correcto = false;
 
-                if ((dtDD.Columns[0].ToString().ToLower().Trim() == "codigo".ToLower().Trim())
-                    && (dtDD.Columns[1].ToString().ToLower().Trim() == "tipo".ToLower().Trim())
-                    && (dtDD.Columns[2].ToString().Trim().ToLower() == "detalle".ToLower().Trim())
-                    && (dtDD.Columns[3].ToString().Trim().ToLower() == "cantidad".ToLower().Trim())
-                    && (dtDD.Columns[4].ToString().Trim().ToLower() == "valor".ToLower().Trim()))
-                   
+                using (var package = new ExcelPackage(new FileInfo(fileLocation)))
                 {
-                    Correcto = true;
-                }
+                    ExcelWorksheet worksheet = package.Workbook.Worksheets.Cast<ExcelWorksheet>().FirstOrDefault();
 
-                if (Correcto)
-                {
-                    DataView dtwExcelRecords = new DataView();
-                    dtwExcelRecords = dtDD.DefaultView;  //se obtiene el total de filas
-                    dtwExcelRecords.RowFilter = "[" + dtDD.Columns[0] + "] is not null"; //se obtiene las filas con datos y evitar recorrer campos nulos
-
-                    DataTable dt2 = dtwExcelRecords.ToTable();
-                    if (dt2.Rows.Count > 0)
+                    if (worksheet == null)
                     {
-                        panelinc.Visible = true;
-                        Button1.Visible = true;
-                    }
-                    foreach (DataRow item in dt2.Rows)
-                    {
-                        dtID.Rows.Add(item["codigo"].ToString(), item["tipo"].ToString(), item["detalle"].ToString(), item["cantidad"].ToString(), item["valor"].ToString());
-
-
+                        lblAlert.Text = "El archivo no tiene hojas válidas.";
+                        alertValida.Visible = true;
+                        return;
                     }
 
-                    gvING.DataSource = dtID;
-                    gvING.DataBind();
+                    // Validamos columnas
+                    bool Correcto = worksheet.Cells[1, 1].Text.Trim().ToLower() == "codigo" &&
+                                     worksheet.Cells[1, 2].Text.Trim().ToLower() == "tipo" &&
+                                     worksheet.Cells[1, 3].Text.Trim().ToLower() == "detalle" &&
+                                     worksheet.Cells[1, 4].Text.Trim().ToLower() == "cantidad" &&
+                                     worksheet.Cells[1, 5].Text.Trim().ToLower() == "valor";
 
-                    Session["dtcargado"] = dtID;
-                   
+                    if (!Correcto)
+                    {
+                        lblAlert.Text = "El formato del archivo no es válido.";
+                        alertValida.Visible = true;
+                        return;
+                    }
+
+                    int rowCount = worksheet.Dimension.End.Row;
+
+                    for (int row = 2; row <= rowCount; row++)
+                    {
+                        if (!string.IsNullOrWhiteSpace(worksheet.Cells[row, 1].Text))
+                        {
+                            dtID.Rows.Add(
+                                worksheet.Cells[row, 1].Text,
+                                worksheet.Cells[row, 2].Text,
+                                worksheet.Cells[row, 3].Text,
+                                worksheet.Cells[row, 4].Text,
+                                worksheet.Cells[row, 5].Text
+                            );
+                        }
+                    }
                 }
 
+                if (dtID.Rows.Count > 0)
+                {
+                    panelinc.Visible = true;
+                    Button1.Visible = true;
+                }
+
+                gv.DataSource = dtID;
+                gv.DataBind();
+
+                Session["dtcargado"] = dtID;
             }
         }
 
@@ -262,7 +227,7 @@ namespace NominaRRHH
                 lblAlert.Text = ex.Message;
             }
         }
-        public void cargarReporte(DataTable dt,  ReportViewer window)
+        public void cargarReporte(DataTable dt, ReportViewer window)
         {
 
             // ReportViewer1.LocalReport.ReportPath = Server.MapPath("../Reportes/IncentivoLayout.rdlc");
