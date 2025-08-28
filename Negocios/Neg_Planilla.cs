@@ -420,7 +420,7 @@ namespace Negocios
                                 {
                                     decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
                                     //NewPlanilla.dimpuestos = NIR.ObtenerIR(dtIRHistorico[k], ingresosdelperiodo, ocasional: false, dtPeriodo[0].tperiodo);
-                                    NewPlanilla.dimpuestos = NIR.ObtenerIR2025(dtIRHistorico[k], (ingresosdelperiodo- ingresovacaciones), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones);
+                                    NewPlanilla.dimpuestos = NIR.ObtenerIR2025(dtIRHistorico[k], ((ingresosdelperiodo - ingresovacaciones) < 0 ? 0 : (ingresosdelperiodo - ingresovacaciones)), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones, ingresosdelperiodo);
                                     k++;
                                 }
                             }
@@ -428,14 +428,14 @@ namespace Negocios
                             {
                                 decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
                                 //NewPlanilla.dimpuestos = NIR.ObtenerIR(null, ingresosgrabables - NewPlanilla.dsegurosocial, ocasional: false, dtPeriodo[0].tperiodo);
-                                NewPlanilla.dimpuestos = NIR.ObtenerIR2025(null, (ingresosdelperiodo - ingresovacaciones), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones);
+                                NewPlanilla.dimpuestos = NIR.ObtenerIR2025(null, ((ingresosdelperiodo - ingresovacaciones) < 0 ? 0 : (ingresosdelperiodo - ingresovacaciones)), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones, ingresosdelperiodo);
                             }
                         }
                         else
                         {
                             decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
                             //NewPlanilla.dimpuestos = NIR.ObtenerIR(null, ingresosgrabables - NewPlanilla.dsegurosocial, ocasional: false, dtPeriodo[0].tperiodo);
-                            NewPlanilla.dimpuestos = NIR.ObtenerIR2025(null, (ingresosdelperiodo - ingresovacaciones), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones);
+                            NewPlanilla.dimpuestos = NIR.ObtenerIR2025(null, ((ingresosdelperiodo - ingresovacaciones) < 0 ? 0 : (ingresosdelperiodo - ingresovacaciones)), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones, ingresosdelperiodo);
                         }
                     }
                     else
