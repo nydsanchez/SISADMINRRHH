@@ -5018,7 +5018,7 @@ namespace Negocios
                             }
                             if (detalle.ToLower() == "docenasmenos")
                             {
-                                valor = ((datoempI.Length == 0) ? default(decimal) : (datoempI.Max((DataRow c) => c.Field<decimal>("costo")) * cantidad));
+                                //valor = ((datoempI.Length == 0) ? default(decimal) : (datoempI.Max((DataRow c) => c.Field<decimal>("costo")) * cantidad));
                                 dtInD.Rows.Add(codigo, 2, detalle, 1, cantidad, valor, "SISTEMA", rubroP, false);
                             }
                             deducciones += valor;

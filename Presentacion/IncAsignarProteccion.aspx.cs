@@ -121,7 +121,7 @@ namespace NominaRRHH.Presentacion
                 {
                     if (decimal.TryParse(txtBonoCalidad.Text, out BonoCalidad))
                     {
-                        new Dato_Incentivos().IncentivoIngDedccLOGInsert(1, codigo, periodo, 1, 1, "OpCritica", 1, BonoCalidad, BonoCalidad, "", 38, false);
+                        new Dato_Incentivos().IncentivoIngDedccLOGInsert(1, codigo, periodo, 1, 1, "OpCriticaYTransporte", 1, BonoCalidad, BonoCalidad, "", 38, false);
                     }
 
                     if (decimal.TryParse(txtAsistencia.Text, out asistencia))

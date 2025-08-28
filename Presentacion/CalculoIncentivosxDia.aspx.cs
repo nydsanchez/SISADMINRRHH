@@ -250,10 +250,15 @@ namespace NominaRRHH.Presentacion
                 {
                     ImprimirCumplimientoModulo(int.Parse(txtPeriodo.Text));
                 }
-                else
+                else if (ddlReporteria.SelectedValue == "4")//cump
                 {
                     ImprimirIncentivoPend();
-                    BtnAutorizarPagosPendientes.Visible = true;
+                    BtnAutorizarPagosPendientes.Visible = true; 
+                }
+
+                else
+                {
+                    ImprimirBonoOpC(int.Parse(txtPeriodo.Text));
                 }
             }
             catch (Exception ex)
@@ -316,11 +321,7 @@ namespace NominaRRHH.Presentacion
                 }
             }
         }
-        //aplicar bono de operacion critica
-       /* protected void BtnAplicarBonoOperacionCritica_Click(object sender, EventArgs e)
-        {
-
-        }*/
+       
 
         #endregion
 
@@ -849,6 +850,11 @@ namespace NominaRRHH.Presentacion
 
                 cargarReporte(sortdt, 2, ReportViewer2);
             }
+        }
+
+        void ImprimirBonoOpC (int periodo)
+        {
+
         }
         #endregion
 

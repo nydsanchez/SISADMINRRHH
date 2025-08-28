@@ -155,11 +155,7 @@
                         <div class="col-md-2">
                             <asp:Button ID="BtnAutorizarPagosPendientes" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Autorizar Pagos Pendientes" OnClick="BtnAutorizarPagosPendientes_Click" />
                         </div>
-                         <div class="col-md-2">
-                            <asp:Button ID="BtnAplicarBonoOperacionCritica" Class="btn btn-warning" Style="margin-top: 22px;" runat="server" Text="Aplicar OpC" visible="false" />
 
-                             <%--OnClick="BtnAplicarBonoOperacionCritica_Click"--%>
-                        </div>
                     </div>
                 </div>
 
@@ -209,6 +205,11 @@
             <div class="row" visible="false" runat="server" id="div7">
                 <label class="control-label" for="focusedInput">Cumplimiento Semanal</label>
                 <rsweb:ReportViewer ID="ReportViewer6" runat="server" Width="1121px" Font-Names="Verdana" Font-Size="8pt" WaitMessageFont-Names="Verdana" WaitMessageFont-Size="14pt">
+                </rsweb:ReportViewer>
+            </div>
+            <div class="row" visible="false" runat="server" id="div8">
+                <label class="control-label" for="focusedInput">Operacion Critica</label>
+                <rsweb:ReportViewer ID="ReportViewer7" runat="server" Width="1121px" Font-Names="Verdana" Font-Size="8pt" WaitMessageFont-Names="Verdana" WaitMessageFont-Size="14pt">
                 </rsweb:ReportViewer>
             </div>
         </div>

@@ -312,15 +312,6 @@ namespace NominaRRHH.Presentacion
         protected global::System.Web.UI.WebControls.Button BtnAutorizarPagosPendientes;
 
         /// <summary>
-        /// BtnAplicarBonoOperacionCritica control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button BtnAplicarBonoOperacionCritica;
-
-        /// <summary>
         /// div5 control.
         /// </summary>
         /// <remarks>
@@ -463,5 +454,23 @@ namespace NominaRRHH.Presentacion
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::Microsoft.Reporting.WebForms.ReportViewer ReportViewer6;
+
+        /// <summary>
+        /// div8 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl div8;
+
+        /// <summary>
+        /// ReportViewer7 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::Microsoft.Reporting.WebForms.ReportViewer ReportViewer7;
     }
 }
