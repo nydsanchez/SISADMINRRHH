@@ -1,12 +1,13 @@
 ﻿<%@ Page Title="" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="ComprobanteNew.aspx.cs" Inherits="NominaRRHH.Presentacion.ComprobanteNew" %>
 
 <asp:Content ID="Content2" ContentPlaceHolderID="MainContent" runat="server">
+    <asp:ScriptManager ID="ScriptManager1" runat="server"></asp:ScriptManager>
     <div class="container mar-top">
         <div class="panel panel-info">
             <div class="panel-body" style="margin-top: 0px">
                 <div class="alert alert-dismissible alert-warning" id="alertValida" runat="server" visible="false">
                     <button type="button" class="close" data-dismiss="alert">×</button>
-                    <asp:Label ID="lblAlert" runat="server" Visible="false"></asp:Label>
+                    <asp:Label ID="lblAlert" runat="server" Visible="true"></asp:Label>
                 </div>
                 <div class="alert alert-dismissible alert-success" id="alertSucces" runat="server" visible="false">
                     <button type="button" class="close" data-dismiss="alert">×</button>

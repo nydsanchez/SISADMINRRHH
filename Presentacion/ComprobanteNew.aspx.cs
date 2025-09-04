@@ -3,22 +3,20 @@ using CrystalDecisions.Shared;
 using Datos;
 //////
 using iTextSharp.text;
-using iTextSharp.text.html.simpleparser;
 using iTextSharp.text.pdf;
 using Negocios;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
-using System.Data.OleDb;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Xml.Schema;
+using OfficeOpenXml;
 
 namespace NominaRRHH.Presentacion
 {
@@ -36,17 +34,16 @@ namespace NominaRRHH.Presentacion
         //private static readonly ILogger logger = LogManager.GetCurrentClassLogger();
         #endregion
         // Crear un objeto PdfRenderer
-        
+
         protected void Page_Load(object sender, EventArgs e)
         {
             if (!IsPostBack)
             {
-                
                 obtenerProcesos();
                 ddlProceso.SelectedIndex = -1;
             }
         }
-        
+
         private void obtenerProcesos()
         {
             this.ddlProceso.DataSource = Neg_Catalogos.CargarProcesos();
@@ -88,7 +85,6 @@ namespace NominaRRHH.Presentacion
                 emailTable.Columns.Add("adjunto");
                 string asunto = "";
 
-
                 if (ChkAllEmpleados.Checked)
                 {
                     Depto = "";
@@ -104,10 +100,7 @@ namespace NominaRRHH.Presentacion
                         {
                             throw new Exception("Error al consolidar periodo");
                         }
-                       
                     }
-
-                   
 
                     if (dtPeriodo[0].tperiodo == 1 && dtPeriodo[0].tplanilla == 4)
                     {
@@ -125,13 +118,7 @@ namespace NominaRRHH.Presentacion
 
                 }
 
-                if (string.IsNullOrWhiteSpace(TxtCodigoE.Text.Trim()))
-                {
-                    // El campo está vacío o solo contiene espacios en blanco
-                    // Aquí puedes mostrar un mensaje de error o realizar alguna acción
-                   // MessageBox.Show("El código no puede estar vacío. Por favor, ingresa un valor válido.");
-                }
-                else
+                if (!string.IsNullOrWhiteSpace(TxtCodigoE.Text.Trim()))
                 {
                     // El campo tiene un valor válido
                     // Aquí puedes continuar con la lógica de tu aplicación
@@ -146,13 +133,8 @@ namespace NominaRRHH.Presentacion
                 if (dsEmpleadospln.Tables.Count > 0)
                 {
                     DataTable dtEmpleadospln = dsEmpleadospln.Tables[0];
-                    if (dtPeriodo[0].tperiodo == 3 || dtPeriodo[0].tperiodo == 4 || dtPeriodo[0].tperiodo == 5)//planilla de aguinaldo o vacaciones
+                    if (dtPeriodo[0].tperiodo != 3 || dtPeriodo[0].tperiodo != 4 || dtPeriodo[0].tperiodo != 5)//
                     {
-                       // html = Neg_Informes.GenerarComprobantePrestacionPdf(dtEmpleadospln, TxtBuscar.Text.Trim(), periodo2, 1, tplanilla, dtPeriodo[0].tperiodo, filtroemail);
-                    }
-                    else
-                    {
-
                         string codigo = "";
                         string email = "";
                         // email colillas
@@ -162,9 +144,9 @@ namespace NominaRRHH.Presentacion
                             foreach (DataRow row in dtEmpleadospln.Rows)
                             {
                                 // Leer el campo "codigo"
-                               codigo = row["codigo"].ToString();
-                               email = row["email"].ToString();
-                                
+                                codigo = row["codigo"].ToString();
+                                email = row["email"].ToString();
+
                                 ChkAllEmpleados.Checked = false;
 
                                 GenerarComprobantePeriodoCR(TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked, ChkAllEmpleados.Checked, codigo, email, false, null);
@@ -172,58 +154,21 @@ namespace NominaRRHH.Presentacion
                                 // Hacer algo con el código (por ejemplo, imprimirlo)
                                 Console.WriteLine(codigo);
                             }
-                            
-
+                        }
+                        if (CheckExcel.Checked)
+                        {
+                            codigoExcel = Session["datos"] as DataTable;
+                            GenerarComprobantePeriodoCR(TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked, ChkAllEmpleados.Checked, codigo, email, CheckExcel.Checked, codigoExcel);
                         }
                         else
                         {
-                            if (CheckExcel.Checked)
-                            {
-                                
-                                codigoExcel = Session["datos"] as DataTable;
-
-
-
-                                GenerarComprobantePeriodoCR(TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked, ChkAllEmpleados.Checked, codigo, email, CheckExcel.Checked, codigoExcel);
-                            }
-                            else
-                            {
-                                // Original
-                                GenerarComprobantePeriodoCR(TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked, ChkAllEmpleados.Checked, codigo, email, CheckExcel.Checked, codigoExcel);
-                                //ChkAllEmpleados.Checked = false;
-                                // GenerarComprobantePeriodoCRV2(TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked, ChkAllEmpleados.Checked, codigo, email, dtEmpleadospln);
-                            }
-
+                            // Original
+                            GenerarComprobantePeriodoCR(TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked, ChkAllEmpleados.Checked, codigo, email, CheckExcel.Checked, codigoExcel);
 
                         }
-
-
-
-                        /// Solo empleados desde Excel
-                        //else
-                        //{
-                        //    filtro = 1;
-                        //    valorFiltro = 0;
-                        //    codigo = Session["datos"] as DataTable;
-                        //}
-                        //DataSet dsEmpleadospln = Neg_Informes.ObtenerEmpleadosPlanilla(txtperiodo.Text.Trim(), txtperiodo.Text, ini, fin, ddlProceso.SelectedValue.Trim(), TxtCodigoE.Text.Trim(), ChkAll.Checked, ChkEfectivo.Checked, filtroemail, false, true);
-                        //if (dsEmpleadospln.Tables.Count > 0)
-                        //{
-                        //    DataTable dtEmpleadospln = dsEmpleadospln.Tables[0];
-                        //    if (codigo.Rows.Count > 0)
-                        //    {
-                        //        int[] codemp = codigo.AsEnumerable().Select(u => u.Field<int>("codigo_empleado")).ToArray();
-                        //        dtEmpleadospln = dtEmpleadospln.AsEnumerable().Where(c => codemp.Contains(c.Field<int>("codigo_empleado"))).CopyToDataTable();
-                        //    }
-                        //    html = Neg_Informes.GenerarColilla_ViaticoPeriodoPdf(dtEmpleadospln, txtperiodo.Text.Trim(), ini, fin, dtPeriodo[0].tperiodo, 1, 4, dtPeriodo[0].tperiodo, filtroemail, encabezado, false);
-                        //}
-
                     }
-
-
-
                 }
-               
+
                 return html;
             }
             catch (Exception ex)
@@ -231,216 +176,24 @@ namespace NominaRRHH.Presentacion
                 throw new Exception(ex.Message);
             }
         }
-
-
-
-
-        //metodos de generacion de comprobantes, Crystal Reports
-        //public void GenerarComprobantePeriodoCR( string nperiodo, int periodo2, int semana2, int tipoplanilla, int tperiodo, int filtroemail, string encabezado, bool periodoConsolida, bool AllEmpleados, string codigo, string email)
-        //{
-        //    try
-        //    {
-        //        Neg_Periodo NPeriodo = new Neg_Periodo();
-        //        dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.PeriodoSel(Convert.ToInt32(nperiodo));
-        //        DateTime ini = dtPeriodo[0].fechaini;
-        //        DateTime fin = dtPeriodo[0].fechafin;
-
-        //        DateTime ini2 = dtPeriodo[0].fechaini2;
-        //        DateTime fin2 = dtPeriodo[0].fechafin2;
-        //        int Semana1 = 0;
-        //        string vmSubtituloS2 = "";
-        //        var vmSubtitulo = "Colilla de Pago del Periodo " + nperiodo + ", Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin2.Date.ToString("d/MM/yyyy");
-        //        vmSubtituloS2 = vmSubtitulo;
-        //        if (periodoConsolida == true)
-        //        {
-        //            if (Convert.ToInt32(nperiodo) != periodo2)
-        //            {
-        //                 ini = dtPeriodo[0].fechaini;
-        //                 fin = dtPeriodo[0].fechafin2;
-
-        //                dsPlanilla.dtPeriodoDataTable dtPeriodo2 = NPeriodo.PeriodoSel(periodo2);
-        //                //ini = dtPeriodo[0].fechaini;
-        //                //fin = dtPeriodo[0].fechafin;
-
-        //                ini2 = dtPeriodo[0].fechaini;
-        //                fin2 = dtPeriodo[0].fechafin2;
-
-        //                vmSubtitulo   = "Colilla de Pago del Periodo " + nperiodo + ", Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin.Date.ToString("d/MM/yyyy");
-        //                vmSubtituloS2 = "Colilla de Pago del Periodo " + periodo2 + ", Del " + ini2.Date.ToString("d/MM/yyyy") + " Al " + fin2.Date.ToString("d/MM/yyyy");
-        //            }
-        //            Semana1 = 1;
-        //            semana2 = 1;
-        //            //DateTime ini2 = dtPeriodo[0].fechaini;
-        //            //DateTime fin2 = dtPeriodo[0].fechafin2;
-        //        }
-        //        else
-        //        {
-        //            periodo2 = Convert.ToInt32( nperiodo);
-        //            //semana2 = 1;
-        //        }
-
-        //        string CodEmpleado = TxtCodigoE.Text.Trim();
-        //        if (filtroemail == 3)
-        //        {
-        //            CodEmpleado = codigo;
-
-        //        }
-
-        //        // Generar el DataSet con los datos
-        //        DataSet Reporte = GenerarPDF(nperiodo, periodo2.ToString(), ini, fin2, ddlProceso.SelectedValue.Trim(), CodEmpleado, ChkAll.Checked, ChkEfectivo.Checked, filtroemail, ChkConsolida.Checked, Semana1, semana2, 1, vmSubtitulo, vmSubtituloS2, AllEmpleados);
-
-        //        // Configuración del reporte
-        //        ReportDocument rd = new ReportDocument();
-        //        rd.Load(Server.MapPath("~/Reportes/ComprobantePago.rpt"));
-        //        rd.SetDataSource(Reporte);
-
-        //        // Acceso al subreporte
-        //        ReportDocument subReport = rd.OpenSubreport("ColillaConceptos1.rpt");
-        //        subReport.SetDataSource(Reporte);
-
-        //        ReportDocument subReport2 = rd.OpenSubreport("ColumnViaticos01.rpt");
-        //        subReport2.SetDataSource(Reporte);
-
-        //        ReportDocument subReport3 = rd.OpenSubreport("ColumnViaticos02.rpt");
-        //        subReport3.SetDataSource(Reporte);
-
-        //        // Asignar parámetros
-        //        rd.SetParameterValue("titEmpresa", "KAIZEN");
-        //        rd.SetParameterValue("FechaVacaciones", fin2.ToShortDateString());
-        //        rd.SetParameterValue("titPeriodo", vmSubtitulo);
-        //        //rd.SetParameterValue("titPeriodoS2", vmSubtituloS2);
-
-
-        //        Response.Buffer = false;
-        //        Response.ClearContent();
-        //        Response.ClearHeaders();
-
-        //        //Exportar el reporte a un Stream
-        //        // 
-        //        string ruta = Server.MapPath("~/Trash/ColillaPago_Periodo_"+ nperiodo +"_Empleado_"+ CodEmpleado + ".pdf");
-
-
-        //        //string directorio = Path.GetDirectoryName(ruta);
-        //        //if (!Directory.Exists(directorio))
-        //        //    Directory.CreateDirectory(directorio); // Crea la carpeta si no existe
-
-        //        //rd.ExportToDisk(ExportFormatType.PortableDocFormat, ruta);
-
-
-
-        //        string asunto = "";
-        //        // envia correo
-        //        if (filtroemail == 3)
-        //        {
-        //            rd.ExportToDisk(ExportFormatType.PortableDocFormat, ruta);
-        //            rd.Close();
-        //            rd.Dispose();
-
-        //            asunto = vmSubtitulo;
-        //            bool resultadoemail = Neg_Informes.EnviarCorreoColillaPDF(asunto, email, ruta);
-        //        }
-        //        else
-        //        {
-        //            // Exportar directamente a Stream
-        //            using (Stream pdfStream = rd.ExportToStream(ExportFormatType.PortableDocFormat))
-        //            {
-        //                Response.Clear();
-        //                Response.ContentType = "application/pdf";
-        //                //Alternativa: Descargar el PDF Directamente
-        //                //Response.AddHeader("content-disposition", "attachment; filename=ComprobantePago.pdf");
-        //                //abrir en la misma pestaña del navegados
-        //                //Response.AddHeader("content-disposition", "inline; filename=ComprobantePago.pdf");
-        //                // Abrir en una Nueva Pestaña
-        //                Response.AddHeader("content-disposition", "inline; filename=ComprobantePagoPeriodo" + nperiodo + "_AL_" + periodo2.ToString() + ".pdf");
-        //                Response.Cache.SetCacheability(HttpCacheability.NoCache);
-        //                pdfStream.CopyTo(Response.OutputStream);
-        //                Response.Flush();
-        //                Response.End();
-        //                rd.Close();
-        //                rd.Dispose();
-        //            }
-        //            //try
-        //            //{
-        //            //    using (Stream pdfStream = rd.ExportToStream(ExportFormatType.PortableDocFormat))
-        //            //    {
-        //            //        Response.Clear();
-        //            //        Response.ContentType = "application/pdf";
-        //            //        Response.AddHeader("content-disposition", "inline; filename=ComprobantePagoPeriodo" + nperiodo + "_AL_" + periodo2.ToString() + ".pdf");
-        //            //        Response.Cache.SetCacheability(HttpCacheability.NoCache);
-        //            //        pdfStream.CopyTo(Response.OutputStream);
-        //            //        Response.Flush();
-        //            //        Response.End();
-        //            //    }
-        //            //}
-        //            //catch (Exception ex)
-        //            //{
-        //            //    // Maneja la excepción según sea necesario
-        //            //    Console.WriteLine("Error al exportar el reporte a PDF: " + ex.Message);
-        //            //}
-        //            //finally
-        //            //{
-        //            //    if (rd != null)
-        //            //    {
-        //            //        rd.Close();
-        //            //        rd.Dispose();
-        //            //    }
-        //            //}
-
-
-        //            //using (Stream stream = rd.ExportToStream(ExportFormatType.PortableDocFormat))
-        //            //{
-        //            //    using (FileStream fileStream = new FileStream(ruta, FileMode.Create, FileAccess.Write))
-        //            //    {
-        //            //        stream.CopyTo(fileStream);
-        //            //    }
-        //            //}
-
-        //            //End
-
-        //        }
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.Message);
-        //    }
-        //}
-
         public void GenerarComprobantePeriodoCR(string nperiodo, int periodo2, int semana2, int tipoplanilla, int tperiodo, int filtroemail, string encabezado, bool periodoConsolida, bool AllEmpleados, string codigo, string email, bool Excel, DataTable dtEmpleados)
         {
-           
-        
             try
-            { 
-
-
-
+            {
                 //// Ruta original del archivo XSD
                 string rutaOriginal = @"c:\K2025\NominaRRHH\NominaRRHH\Reportes\DataSets\Colillas.xsd";
 
                 //// Nueva ruta del archivo XSD
                 string nuevaRuta = @"c:\inetpub\wwwroot\SISADMINRRHH\Reportes\DataSets\Colillas.xsd";
-             
-                               
+
                 //// Cargar el esquema desde la ruta original
                 XmlSchema esquema = CargarEsquema(rutaOriginal);
 
-               
                 if (esquema == null)
                 {
                     // Si no se pudo cargar desde la ruta original, intenta con la nueva ruta
                     esquema = CargarEsquema(nuevaRuta);
                 }
-
-                //// Verificar si el esquema se cargó correctamente
-                //if (esquema != null)
-                //{
-                //    Console.WriteLine("Esquema cargado correctamente.");
-                //    // Aquí puedes trabajar con el esquema
-                //}
-                //else
-                //{
-                //    Console.WriteLine("No se pudo cargar el esquema desde ninguna de las rutas.");
-                //}
 
                 Neg_Periodo NPeriodo = new Neg_Periodo();
                 dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.PeriodoSel(Convert.ToInt32(nperiodo));
@@ -460,7 +213,7 @@ namespace NominaRRHH.Presentacion
                     throw new Exception("No se encontraron datos para el periodo especificado.");
                 }
 
-                if (periodoConsolida == true)
+                if (periodoConsolida)
                 {
                     if (Convert.ToInt32(nperiodo) != periodo2)
                     {
@@ -473,7 +226,6 @@ namespace NominaRRHH.Presentacion
 
                         vmSubtitulo = "Colilla de Pago del Periodo " + nperiodo + " Al " + periodo2 + " Fechas : Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin2.Date.ToString("d/MM/yyyy");
                         vmSubtituloS1 = "Colilla de Pago del Periodo " + nperiodo + ", Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin.Date.ToString("d/MM/yyyy");
-                        //vmSubtitulo = "Colilla de Pago del Periodo " + nperiodo + ", Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin.Date.ToString("d/MM/yyyy");
                         vmSubtituloS2 = "Colilla de Pago del Periodo " + periodo2 + ", Del " + ini2.Date.ToString("d/MM/yyyy") + " Al " + fin2.Date.ToString("d/MM/yyyy");
                     }
                     Semana1 = 1;
@@ -493,8 +245,6 @@ namespace NominaRRHH.Presentacion
                 // Generar el DataSet con los datos
                 DataSet Reporte = GenerarPDF(nperiodo, periodo2.ToString(), ini, fin2, ddlProceso.SelectedValue.Trim(), CodEmpleado, ChkAll.Checked, ChkEfectivo.Checked, filtroemail, ChkConsolida.Checked, Semana1, semana2, 1, vmSubtituloS1, vmSubtituloS2, AllEmpleados, Excel, dtEmpleados);
 
-
-               
                 // Configuración del reporte
                 //ReportDocument rd = new ReportDocument();
 
@@ -507,15 +257,10 @@ namespace NominaRRHH.Presentacion
 
 
                     // Nombres de las tablas que necesitas para el subreporte
-                    string[] tablasRequeridas = new string[] { "ObtenerEmpleadosPlanillaSP",  "periodos" };
+                    string[] tablasRequeridas = new string[] { "ObtenerEmpleadosPlanillaSP", "periodos" };
 
                     // Generar el DataSet para el subreporte
                     temporalDataSetR1 = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
-
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSetR1.Tables.Add(Reporte.Tables["ObtenerEmpleadosPlanillaSP"].Copy());
-                    //temporalDataSetR1.Tables.Add(Reporte.Tables["ObtenerEncComprobantePago"].Copy());
-                    //temporalDataSetR1.Tables.Add(Reporte.Tables["periodos"].Copy());
 
 
                     rd.SetDataSource(temporalDataSetR1);
@@ -526,11 +271,8 @@ namespace NominaRRHH.Presentacion
                     DataSet temporalDataSetC1 = new DataSet();
                     //subReport2.SetDataSource(Reporte);
 
-                    tablasRequeridas = new string[] { "ObtenerEstructuraComprobantePago",  "periodos" };
+                    tablasRequeridas = new string[] { "ObtenerEstructuraComprobantePago", "periodos" };
 
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSetC1.Tables.Add(Reporte.Tables["ObtenerEstructuraComprobantePago"].Copy());
-                    //temporalDataSetC1.Tables.Add(Reporte.Tables["periodos"].Copy());
                     temporalDataSetC1 = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
 
                     subReport.SetDataSource(temporalDataSetC1);
@@ -542,9 +284,7 @@ namespace NominaRRHH.Presentacion
                     //subReport2.SetDataSource(Reporte);
                     tablasRequeridas = new string[] { "ObtenerEstructuraComprobantePagoNewV2", "periodos" };
 
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSetC2.Tables.Add(Reporte.Tables["ObtenerEstructuraComprobantePagoNewV2"].Copy());
-                    //temporalDataSetC2.Tables.Add(Reporte.Tables["periodos"].Copy());
+
                     temporalDataSetC2 = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
 
                     subReportE.SetDataSource(temporalDataSetC2);
@@ -557,14 +297,11 @@ namespace NominaRRHH.Presentacion
 
                     tablasRequeridas = new string[] { "ViaticosS1", "periodos" };
 
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSet1.Tables.Add(Reporte.Tables["ViaticosS1"].Copy());
-                    //temporalDataSet1.Tables.Add(Reporte.Tables["periodos"].Copy());
+
                     temporalDataSet1 = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
 
                     // Pasar el nuevo DataSet al subreporte
                     subReport2.SetDataSource(temporalDataSet1);
-
 
 
                     ReportDocument subReport3 = rd.OpenSubreport("ColumnViaticos02.rpt");
@@ -573,9 +310,7 @@ namespace NominaRRHH.Presentacion
                     DataSet temporalDataSet2 = new DataSet();
                     tablasRequeridas = new string[] { "ViaticosS2", "periodos" };
 
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSet2.Tables.Add(Reporte.Tables["ViaticosS2"].Copy());
-                    //temporalDataSet2.Tables.Add(Reporte.Tables["periodos"].Copy());
+
                     temporalDataSet2 = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
 
                     // Pasar el nuevo DataSet al subreporte
@@ -589,9 +324,7 @@ namespace NominaRRHH.Presentacion
                     //subReport2.SetDataSource(Reporte);
                     tablasRequeridas = new string[] { "ObtenerEstructuraComprobantePago", "periodos" };
 
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSetC1b.Tables.Add(Reporte.Tables["ObtenerEstructuraComprobantePago"].Copy());
-                    //temporalDataSetC1b.Tables.Add(Reporte.Tables["periodos"].Copy());
+
                     temporalDataSetC1b = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
 
                     subReportb1.SetDataSource(temporalDataSetC1b);
@@ -603,12 +336,9 @@ namespace NominaRRHH.Presentacion
                     //subReport2.SetDataSource(Reporte);
                     tablasRequeridas = new string[] { "ObtenerEstructuraComprobantePagoNewV2", "periodos" };
 
-                    // Agregar solo las tablas necesarias
-                    //temporalDataSetC2b.Tables.Add(Reporte.Tables["ObtenerEstructuraComprobantePagoNewV2"].Copy());
-                    //temporalDataSetC2b.Tables.Add(Reporte.Tables["periodos"].Copy());
+
                     temporalDataSetC2b = GenerarDataSetSubReporte(Reporte, tablasRequeridas);
                     subReportb2.SetDataSource(temporalDataSetC2b);
-
 
                     // Asignar parámetros
                     rd.SetParameterValue("titEmpresa", "KAIZEN");
@@ -621,14 +351,9 @@ namespace NominaRRHH.Presentacion
 
                     string ruta = Server.MapPath("~/Trash/ColillaPago_Periodo_" + nperiodo + "_Empleado_" + CodEmpleado + ".pdf");
 
-
-
                     if (filtroemail == 3)
                     {
                         rd.ExportToDisk(ExportFormatType.PortableDocFormat, ruta);
-                        //rd.Close();
-                        //rd.Dispose();
-                        // Cerrar y liberar recursos del ReportDocument
                         rd.Close();
                         rd.Dispose();
                         string asunto = vmSubtitulo;
@@ -636,8 +361,6 @@ namespace NominaRRHH.Presentacion
                     }
                     else
                     {
-                        
-
                         // Esta es la ultima version 2025
                         try
                         {
@@ -648,7 +371,6 @@ namespace NominaRRHH.Presentacion
                                 Response.ContentType = "application/pdf";
                                 Response.AddHeader("content-disposition", $"inline; filename=ComprobantePagoPeriodo{nperiodo}.pdf");
                                 Response.Buffer = false;
-
 
                                 // Copiar el contenido directamente a la respuesta
                                 pdfStream.CopyTo(Response.OutputStream);
@@ -673,41 +395,21 @@ namespace NominaRRHH.Presentacion
                                 rd.Dispose();
                             }
                         }
-                       
+
                     }
 
-                    
+
                 }
 
             }
             catch (SqlException ex)
             {
-                //logger.Error(ex, "Ocurrió un error en GenerarComprobantePeriodoCR");
-                //string errorMessage = "Error al conectar a la base de datos: " + HttpUtility.JavaScriptStringEncode(ex.Message) +
-                //                      " \\n Stack Trace: " + HttpUtility.JavaScriptStringEncode(ex.StackTrace) +
-                //                      " \\n Línea: " + ex.LineNumber; // Asegúrate de que ex.LineNumber esté disponible
-                //ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", $"mostrarMensajeEnConsola('{errorMessage}');", true);
                 throw;
             }
             catch (Exception ex)
             {
-                //logger.Error(ex, "Ocurrió un error en GenerarComprobantePeriodoCR");
-                //// Aquí puedes agregar información adicional si es necesario
-                //string errorMessage = "Error al ejecutar el comando: " + HttpUtility.JavaScriptStringEncode(ex.Message) +
-                //                      " \\n Stack Trace: " + HttpUtility.JavaScriptStringEncode(ex.StackTrace);
-                //ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", $"mostrarMensajeEnConsola('{errorMessage}');", true);
                 throw;
             }
-
-            //{
-            //    // Enviar mensaje de error a la consola de la página web
-            //    ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al conectar a la base de datos: " + ex.Message + "');", true);
-            //}
-            //catch (Exception ex)
-            //{
-            //    // Enviar mensaje de error a la consola de la página web
-            //    ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al ejecutar el comando: " + ex.Message + "');", true);
-            //}
         }
 
         private DataSet GenerarDataSetSubReporte(DataSet reporte, string[] tablas)
@@ -727,12 +429,12 @@ namespace NominaRRHH.Presentacion
 
             // Listar los nombres de los DataTable a procesar
             string[] nombresTablas = {
-        "ObtenerEmpleadosPlanillaSP",
-        "ObtenerEncComprobantePago",
-        "ObtenerEstructuraComprobantePago",
-        "ObtenerEstructuraComprobantePagoNewV2",
-        "ViaticosS1",
-        "ViaticosS2"
+                "ObtenerEmpleadosPlanillaSP",
+                "ObtenerEncComprobantePago",
+                "ObtenerEstructuraComprobantePago",
+                "ObtenerEstructuraComprobantePagoNewV2",
+                "ViaticosS1",
+                "ViaticosS2"
     };
 
             // Filtrar cada DataTable por el código y agregarlo al nuevo DataSet
@@ -777,222 +479,6 @@ namespace NominaRRHH.Presentacion
             return nuevoDataSet;
         }
 
-
-        // version no 2
-
-        //public void GenerarComprobantePeriodoCRV2(string nperiodo, int periodo2, int semana2, int tipoplanilla, int tperiodo, int filtroemail, string encabezado, bool periodoConsolida, bool AllEmpleados, string codigo, string email, DataTable empleados)
-        //{
-
-
-        //    try
-        //    {
-
-                
-        //        Neg_Periodo NPeriodo = new Neg_Periodo();
-        //        dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.PeriodoSel(Convert.ToInt32(nperiodo));
-        //        DateTime ini = dtPeriodo[0].fechaini;
-        //        DateTime fin = dtPeriodo[0].fechafin;
-
-        //        DateTime ini2 = dtPeriodo[0].fechaini2;
-        //        DateTime fin2 = dtPeriodo[0].fechafin2;
-        //        int Semana1 = 0;
-        //        string vmSubtituloS2 = "";
-        //        var vmSubtitulo = "Colilla de Pago del Periodo " + nperiodo + ", Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin2.Date.ToString("d/MM/yyyy");
-        //        vmSubtituloS2 = vmSubtitulo;
-        //        if (dtPeriodo.Rows.Count == 0)
-        //        {
-        //            //logger.Error("No se encontraron datos para el periodo especificado.");
-        //            throw new Exception("No se encontraron datos para el periodo especificado.");
-        //        }
-
-        //        if (periodoConsolida == true)
-        //        {
-        //            if (Convert.ToInt32(nperiodo) != periodo2)
-        //            {
-        //                ini = dtPeriodo[0].fechaini;
-        //                fin = dtPeriodo[0].fechafin2;
-
-        //                dsPlanilla.dtPeriodoDataTable dtPeriodo2 = NPeriodo.PeriodoSel(periodo2);
-        //                ini2 = dtPeriodo[0].fechaini;
-        //                fin2 = dtPeriodo[0].fechafin2;
-
-        //                vmSubtitulo = "Colilla de Pago del Periodo " + nperiodo + " Al " + periodo2 + " Fechas : Del " + ini.Date.ToString("d/MM/yyyy") +  " Al " + fin2.Date.ToString("d/MM/yyyy");
-
-                          
-        //                //vmSubtitulo = "Colilla de Pago del Periodo " + nperiodo + ", Del " + ini.Date.ToString("d/MM/yyyy") + " Al " + fin.Date.ToString("d/MM/yyyy");
-        //                //vmSubtituloS2 = "Colilla de Pago del Periodo " + periodo2 + ", Del " + ini2.Date.ToString("d/MM/yyyy") + " Al " + fin2.Date.ToString("d/MM/yyyy");
-        //            }
-        //            Semana1 = 1;
-        //            semana2 = 1;
-        //        }
-        //        else
-        //        {
-        //            periodo2 = Convert.ToInt32(nperiodo);
-        //        }
-
-        //        string CodEmpleado = TxtCodigoE.Text.Trim();
-        //        if (filtroemail == 3)
-        //        {
-        //            CodEmpleado = codigo;
-        //        }
-
-        //        // Ruta temporal para archivos individuales
-        //        string carpetaTemporal = Server.MapPath("~/Trash/Temp/");
-        //        if (!Directory.Exists(carpetaTemporal))
-        //            Directory.CreateDirectory(carpetaTemporal);
-
-        //        List<string> archivosGenerados = new List<string>();
-
-
-        //        // Generar el DataSet con los datos
-        //        //DataSet nuevoDataSet  = GenerarPDF(nperiodo, periodo2.ToString(), ini, fin2, ddlProceso.SelectedValue.Trim(), CodEmpleado, ChkAll.Checked, ChkEfectivo.Checked, filtroemail, ChkConsolida.Checked, Semana1, semana2, 1, vmSubtitulo, vmSubtituloS2, AllEmpleados);
-
-        //        // Recorrer cada empleado en el DataTable
-        //        foreach (DataRow empleado in empleados.Rows)
-        //        {
-        //            CodEmpleado = empleado["Codigo"].ToString();
-
-        //            //DataTable tablaPeriodos = nuevoDataSet.Tables["periodos"];
-
-        //            // filtramos datos por empleado
-        //            //DataSet Reporte  = FiltrarYConstruirDataSet(nuevoDataSet, CodEmpleado, tablaPeriodos);
-
-        //            DataSet Reporte = GenerarPDF(nperiodo, periodo2.ToString(), ini, fin2, ddlProceso.SelectedValue.Trim(), CodEmpleado, ChkAll.Checked, ChkEfectivo.Checked, filtroemail, ChkConsolida.Checked, Semana1, semana2, 1, vmSubtitulo, vmSubtituloS2, AllEmpleados);
-
-        //            // Configuración del reporte
-        //            ReportDocument rd = new ReportDocument();
-        //            rd.Load(Server.MapPath("~/Reportes/ComprobantePago.rpt"));
-        //            rd.SetDataSource(Reporte);
-
-        //            // Acceso al subreporte ingresos
-        //            ReportDocument subReport = rd.OpenSubreport("ColillaConceptos1.rpt");
-        //            subReport.SetDataSource(Reporte);
-
-        //            // Acceso al subreporte Egresos
-        //            ReportDocument subReportE = rd.OpenSubreport("ColillaConceptos2.rpt");
-        //            subReportE.SetDataSource(Reporte);
-
-
-        //            ReportDocument subReport2 = rd.OpenSubreport("ColumnViaticos01.rpt");
-        //            subReport2.SetDataSource(Reporte);
-
-        //            ReportDocument subReport3 = rd.OpenSubreport("ColumnViaticos02.rpt");
-        //            subReport3.SetDataSource(Reporte);
-
-        //            // Asignar parámetros
-        //            rd.SetParameterValue("titEmpresa", "KAIZEN");
-        //            rd.SetParameterValue("FechaVacaciones", fin2.ToShortDateString());
-        //            rd.SetParameterValue("titPeriodo", vmSubtitulo);
-
-        //            Response.Buffer = false;
-        //            Response.ClearContent();
-        //            Response.ClearHeaders();
-
-        //            string ruta = Server.MapPath("~/Trash/ColillaPago_Periodo_" + nperiodo + "_Empleado_" + CodEmpleado + ".pdf");
-
-        //            // Exportar el archivo individual
-        //            string rutaArchivoEmpleado = Path.Combine(carpetaTemporal, $"Colilla_{CodEmpleado}.pdf");
-        //            rd.ExportToDisk(ExportFormatType.PortableDocFormat, rutaArchivoEmpleado);
-        //            archivosGenerados.Add(rutaArchivoEmpleado);
-
-        //            // Liberar recursos
-        //            rd.Close();
-        //            rd.Dispose();
-
-        //            //if (CodEmpleado == "871992")
-        //            //{
-        //            //    break;
-        //            //}
-        //        }
-
-        //        string rutaSalida = Server.MapPath("~/Trash/ColillaPago_Periodo_" + nperiodo + ".pdf");
-        //        // Combinar todos los PDFs en uno solo
-        //        CombinarPDFs(archivosGenerados, rutaSalida);
-
-        //        // Limpiar archivos temporales
-        //        foreach (string archivo in archivosGenerados)
-        //        {
-        //            if (File.Exists(archivo)) File.Delete(archivo);
-        //        }
-
-        //        // Opcional: mostrar el archivo combinado al usuario
-        //        Response.Clear();
-        //        Response.ContentType = "application/pdf";
-        //        Response.AddHeader("content-disposition", $"inline; filename=ColillasPeriodo_{nperiodo}.pdf");
-        //        Response.WriteFile(rutaSalida);
-        //        Response.Flush();
-        //        Response.End();
-
-
-        //        //if (filtroemail == 3)
-        //        //{
-        //        //    rd.ExportToDisk(ExportFormatType.PortableDocFormat, ruta);
-
-        //        //    // Cerrar y liberar recursos del ReportDocument
-        //        //    rd.Close();
-        //        //    rd.Dispose();
-        //        //    string asunto = vmSubtitulo;
-        //        //    bool resultadoemail = Neg_Informes.EnviarCorreoColillaPDF(asunto, email, ruta);
-        //        //}
-        //        //else
-        //        //{
-
-
-        //        //    using (Stream pdfStream = rd.ExportToStream(ExportFormatType.PortableDocFormat))
-        //        //    {
-        //        //        Response.Clear();
-        //        //        Response.ContentType = "application/pdf";
-        //        //        Response.AddHeader("content-disposition", $"inline; filename=ComprobantePagoPeriodo{nperiodo}.pdf");
-        //        //        Response.Buffer = true; // Asegura que todo el contenido se procese antes de enviarlo.
-
-        //        //        // Copiar el contenido directamente a la respuesta
-        //        //        pdfStream.CopyTo(Response.OutputStream);
-
-        //        //        // Limpia recursos y cierra conexión
-        //        //        Response.Flush();
-        //        //        Response.SuppressContent = true; // Impide procesar más contenido en la respuesta.
-        //        //        HttpContext.Current.ApplicationInstance.CompleteRequest(); // Finaliza la solicitud correctamente.
-        //        //    }
-        //        //    rd.Close();
-        //        //    rd.Dispose();
-
-
-
-        //        //}
-
-
-        //    }
-        //    catch (SqlException ex)
-        //    {
-        //        //logger.Error(ex, "Ocurrió un error en GenerarComprobantePeriodoCR");
-        //        //string errorMessage = "Error al conectar a la base de datos: " + HttpUtility.JavaScriptStringEncode(ex.Message) +
-        //        //                      " \\n Stack Trace: " + HttpUtility.JavaScriptStringEncode(ex.StackTrace) +
-        //        //                      " \\n Línea: " + ex.LineNumber; // Asegúrate de que ex.LineNumber esté disponible
-        //        //ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", $"mostrarMensajeEnConsola('{errorMessage}');", true);
-        //        throw;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        //logger.Error(ex, "Ocurrió un error en GenerarComprobantePeriodoCR");
-        //        //// Aquí puedes agregar información adicional si es necesario
-        //        //string errorMessage = "Error al ejecutar el comando: " + HttpUtility.JavaScriptStringEncode(ex.Message) +
-        //        //                      " \\n Stack Trace: " + HttpUtility.JavaScriptStringEncode(ex.StackTrace);
-        //        //ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", $"mostrarMensajeEnConsola('{errorMessage}');", true);
-        //        throw;
-        //    }
-
-        //    //{
-        //    //    // Enviar mensaje de error a la consola de la página web
-        //    //    ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al conectar a la base de datos: " + ex.Message + "');", true);
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    // Enviar mensaje de error a la consola de la página web
-        //    //    ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al ejecutar el comando: " + ex.Message + "');", true);
-        //    //}
-        //}
-
-        // version mejorada
         public void GenerarColillasCombinadas(string nperiodo, DataTable empleados, string rutaSalida)
         {
             try
@@ -1112,13 +598,13 @@ namespace NominaRRHH.Presentacion
                 return null; // Retornar null en caso de error
             }
         }
-        private DataSet GenerarPDF(string periodo1, string periodo2, DateTime fechaini, DateTime fechafin,string depto, string codigo,  bool tarjeta, bool efectivo, int filtroemail, bool consolida, int semana1 , int semana2, int idEmpresa, string vmSubtitulo, string vmSubtituloS2, bool AllEmpleados, bool Excel, DataTable dtEmpleados)
+        private DataSet GenerarPDF(string periodo1, string periodo2, DateTime fechaini, DateTime fechafin, string depto, string codigo, bool tarjeta, bool efectivo, int filtroemail, bool consolida, int semana1, int semana2, int idEmpresa, string vmSubtitulo, string vmSubtituloS2, bool AllEmpleados, bool Excel, DataTable dtEmpleados)
         {
             Neg_Periodo NPeriodo = new Neg_Periodo();
             Neg_Informes dviaticosS2 = new Neg_Informes();
             dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.PeriodoSel(Convert.ToInt32(periodo1));
             int vmTipoPlanilla = dtPeriodo[0].tplanilla;
-             
+
             if (!String.IsNullOrEmpty(codigo))
             {
                 depto = "";
@@ -1159,17 +645,14 @@ namespace NominaRRHH.Presentacion
                     command.Parameters.AddWithValue("@filtroemail", filtroemail);
                     command.Parameters.AddWithValue("@periodoConsolida", consolida);
                     command.Parameters.AddWithValue("@AllEmpleados", AllEmpleados);
-                    
+
 
                     try
                     {
-                        
+
                         connection.Open();
                         using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                         {
-                          
-
-
                             adapter.Fill(resultado, "ObtenerEmpleadosPlanillaSP");
 
 
@@ -1177,7 +660,7 @@ namespace NominaRRHH.Presentacion
                             {
                                 resultado.Tables.Remove("ObtenerEmpleadosPlanillaSP1");
                             }
-                 
+
                             // Periodo base
                             //dtEmpleadospln.Rows[i]["periodo"].ToString();
                         }
@@ -1195,71 +678,62 @@ namespace NominaRRHH.Presentacion
                     }
                     finally
                     {
-                        if (connection.State == ConnectionState.Open) connection.Close();
+                        if (connection.State == ConnectionState.Open)
+                        {
+                            connection.Close();
+                        }
+
                     }
                 }
 
-                // Encabezado Comprobante de Pago
-                //strSqlCommand = @"[dbo].[ObtenerEncComprobantePagoNewV2]";
-                //using (SqlCommand command = new SqlCommand(strSqlCommand, connection))
-                //{
-                //    command.CommandType = CommandType.StoredProcedure;
-                //    SqlParameter p1 = new SqlParameter("@periodoini", SqlDbType.NChar);
-                //    p1.Value = periodo1;
-                //    command.Parameters.Add(p1);
-                //    SqlParameter p2 = new SqlParameter("@periodofin", SqlDbType.NChar);
-                //    p2.Value = periodo2;
-                //    command.Parameters.Add(p2);
+                // Encabezado Comprobante de Pagoe
+                strSqlCommand = @"[dbo].[ObtenerEncComprobantePagoNewV2]";
+                using (SqlCommand command = new SqlCommand(strSqlCommand, connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    SqlParameter p1 = new SqlParameter("@periodoini", SqlDbType.NChar);
+                    p1.Value = periodo1;
+                    command.Parameters.Add(p1);
+                    SqlParameter p2 = new SqlParameter("@periodofin", SqlDbType.NChar);
+                    p2.Value = periodo2;
+                    command.Parameters.Add(p2);
 
-                //    SqlParameter p3 = new SqlParameter("@codigo", SqlDbType.Int);                    
-                //    // Asignar a p3.Value el valor convertido o cero si 'codigo' está vacío
-                //    p3.Value = string.IsNullOrEmpty(codigo) ? 0 : Convert.ToInt32(codigo);
-                //    command.Parameters.Add(p3);
+                    SqlParameter p3 = new SqlParameter("@codigo", SqlDbType.Int);
 
-                //    SqlParameter p4 = new SqlParameter("@semana", SqlDbType.Int);
-                //    p4.Value = semana1;
-                //    command.Parameters.Add(p4);
-                //    //SqlParameter p5 = new SqlParameter("@semana2", SqlDbType.Int);
-                //    //p5.Value = semana1;
-                //    //command.Parameters.Add(p5);
+                    p3.Value = string.IsNullOrEmpty(codigo) ? 0 : Convert.ToInt32(codigo);
+                    command.Parameters.Add(p3);
 
+                    SqlParameter p4 = new SqlParameter("@semana", SqlDbType.Int);
+                    p4.Value = semana1;
+                    command.Parameters.Add(p4);
 
-                //    try
-                //    {
-                //        connection.Open();
-                //        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-                //        {
-                //            adapter.Fill(resultado, "ObtenerEncComprobantePago");
-
-
-                //        }
-                //    }
-                //    catch (SqlException ex)
-                //    {
-                //        ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al conectar a la base de datos: " + ex.Message + "');", true);
-                //        Console.WriteLine("Error al conectar a la base de datos: " + ex.Message); // Manejar el error de conexión
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al ejecutar el comando: " + ex.Message + "');", true);
-                //        Console.WriteLine("Error al ejecutar el comando: " + ex.Message);
-                //        // Manejar otros errores 
-                //    }
-                //    finally
-                //    {
-                //        if (connection.State == ConnectionState.Open) connection.Close();
-                //    }
-                //}
-
-
-
-                // solo si es catorcenal
-                //if (vmTipoPlanilla == 4)
-                //{
-                //    periodo2 = periodo1;
-                //    semana2 = 1;
-                //    vmTipoPlanilla = 4;
-                //}
+                    try
+                    {
+                        connection.Open();
+                        using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                        {
+                            adapter.Fill(resultado, "ObtenerEncComprobantePago");
+                        }
+                    }
+                    catch (SqlException ex)
+                    {
+                        ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al conectar a la base de datos: " + ex.Message + "');", true);
+                        Console.WriteLine("Error al conectar a la base de datos: " + ex.Message); // Manejar el error de conexión
+                    }
+                    catch (Exception ex)
+                    {
+                        ScriptManager.RegisterStartupScript(this, GetType(), "mostrarMensaje", "mostrarMensajeEnConsola('Error al ejecutar el comando: " + ex.Message + "');", true);
+                        Console.WriteLine("Error al ejecutar el comando: " + ex.Message);
+                        // Manejar otros errores 
+                    }
+                    finally
+                    {
+                        if (connection.State == ConnectionState.Open)
+                        {
+                            connection.Close();
+                        }
+                    }
+                }
 
 
                 // Encabezado Comprobante de Pago Solo Ingresos
@@ -1277,18 +751,12 @@ namespace NominaRRHH.Presentacion
                     p3.Value = 1; // tipo de concepto 1 = ingresos
                     command.Parameters.Add(p3);
 
-                    //SqlParameter p4 = new SqlParameter("@codigo", SqlDbType.Int);
-                    //// Asignar a p3.Value el valor convertido o cero si 'codigo' está vacío
-                    //p4.Value = string.IsNullOrEmpty(codigo) ? 0 : Convert.ToInt32(codigo);
-                    //command.Parameters.Add(p4);
-
                     try
                     {
                         connection.Open();
                         using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                         {
                             adapter.Fill(resultado, "ObtenerEstructuraComprobantePago");
-
 
                         }
                     }
@@ -1325,19 +793,12 @@ namespace NominaRRHH.Presentacion
                     p3.Value = 2; // tipo de concepto 2 = egresos
                     command.Parameters.Add(p3);
 
-                    //SqlParameter p4 = new SqlParameter("@codigo", SqlDbType.Int);
-                    //// Asignar a p3.Value el valor convertido o cero si 'codigo' está vacío
-                    //p3.Value = string.IsNullOrEmpty(codigo) ? 0 : Convert.ToInt32(codigo);
-                    //command.Parameters.Add(p4);
-
                     try
                     {
                         connection.Open();
                         using (SqlDataAdapter adapter = new SqlDataAdapter(command))
                         {
                             adapter.Fill(resultado, "ObtenerEstructuraComprobantePagoNewV2");
-
-
                         }
                     }
                     catch (SqlException ex)
@@ -1375,7 +836,7 @@ namespace NominaRRHH.Presentacion
             nuevaFila["TitPeriodoS1"] = vmSubtitulo; // Asignar el valor de vmSubtitulo
             nuevaFila["TitPeriodoS2"] = vmSubtituloS2; // Asignar el valor de vmSubtituloS2
             string CadConsolidad = "0";
-           if (consolida)
+            if (consolida)
             {
                 CadConsolidad = "1";
             }
@@ -1385,25 +846,17 @@ namespace NominaRRHH.Presentacion
 
             resultado.Tables["Periodos"].Rows.Add(nuevaFila);
 
-
-
-
             DataSet ds = null;
             ds = Neg_Informes.CargarIngresoPeriodoIBruto(Convert.ToInt32(periodo1), Convert.ToInt32(periodo2), 0);
 
-            //DataRow[] existeviaticopS1 = null;
-
             DataTable viaticopersonaS1 = new DataTable();
-            //bool existeVS1 = false;
 
-            // Agrega datos de Vacaciones a Maestro de empleados
-            // Asegúrate de que resultado.Tables["ObtenerEmpleadosPlanillaSP"] y Datos.Rows[0]["saldovacaciones"] existan
             if (resultado.Tables.Contains("ObtenerEmpleadosPlanillaSP") && resultado.Tables["ObtenerEmpleadosPlanillaSP"].Rows.Count > 0)
             {
 
                 //Neg_Liquidacion liquidacion = new Neg_Liquidacion();
 
-               tablaEmpleados = resultado.Tables["ObtenerEmpleadosPlanillaSP"];
+                tablaEmpleados = resultado.Tables["ObtenerEmpleadosPlanillaSP"];
 
                 foreach (DataRow fila in tablaEmpleados.Rows)
                 {
@@ -1433,12 +886,12 @@ namespace NominaRRHH.Presentacion
 
                     dsPlanilla.dtPeriodoDataTable dtPeriodo2Vac = NPeriodo.PeriodoSel(Convert.ToInt32(periodo2));
                     DateTime ini1vac;
-                    DateTime fin2vac ;
+                    DateTime fin2vac;
                     fin2vac = fechafin;
                     int ruptura = 0;
                     if (consolida)
                     {
-                        
+
                         if (codigoE == 871098)
                         {
                             ruptura = 2;
@@ -1481,8 +934,8 @@ namespace NominaRRHH.Presentacion
 
                         // filtramos datos del empleado
                         var viaticopersonaS11 = (from c in tablaEmpleadosEnc.AsEnumerable().AsQueryable()
-                                            where c.Field<string>("codigo") == codigoE.ToString()
-                                            select c).ToList();
+                                                 where c.Field<string>("codigo") == codigoE.ToString()
+                                                 select c).ToList();
 
                         decimal vmMontoPrestamo = 0;
                         decimal vmSaldoPrestamo = 0;
@@ -1495,11 +948,16 @@ namespace NominaRRHH.Presentacion
 
                         if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
                         {
-                            vmProteccion = ds.Tables[0].Select($"[codigo]='{codigoE.ToString().Trim()}' and [tipoIngrDeduc]<>'{25}'").Sum((DataRow c) => Convert.ToDecimal(c["valor"]));
-                            vmBono = ds.Tables[0].Select($"[codigo]='{codigoE.ToString().Trim()}' and [tipoIngrDeduc]='{25}'").Sum((DataRow c) => Convert.ToDecimal(c["valor"]));
+                            var filasProteccion = ds.Tables[0].AsEnumerable()
+                                .Where(fila3 => fila3.Field<string>("codigo").Trim() == codigoE.ToString().Trim() && fila3.Field<int>("tipoingrdeduc") != 25);
+
+                            vmProteccion = filasProteccion.Any() ? filasProteccion.Sum(c => c.Field<decimal>("valor")) : 0m;
+
+
+                            vmBono = ds.Tables[0].Select($"[codigo]='{codigoE.ToString().Trim()}' and [tipoIngrDeduc]=25").Sum((DataRow c) => Convert.ToDecimal(c["valor"]));
                             vmIngresoEspecial = ((vmProteccion == 0m) ? vmOtros : vmProteccion);
                         }
-                        decimal valorRedondeado = 0 ;
+                        decimal valorRedondeado = 0;
                         if (viaticopersonaS11.Count() > 0)
                         {
                             // Acceder al primer (y único) registro y obtener el valor de 'totalapagar'
@@ -1507,38 +965,32 @@ namespace NominaRRHH.Presentacion
                             vmSaldoPrestamo = viaticopersonaS11.First().Field<decimal?>("Saldo") ?? 0; // Asigna 0 si es nulo
                             vmAhorro = viaticopersonaS11.First().Field<decimal?>("ahorro") ?? 0; // Asigna 0 si es nulo
                             vmHrsBV = viaticopersonaS11.First().Field<decimal?>("horasbv") ?? 0; // Asigna 0 si es nulo
-                            vmBono  = viaticopersonaS11.First().Field<decimal?>("bonovariable") ?? 0; // Asigna 0 si es nulo;
-                            //valorRedondeado = (int)Math.Ceiling(vmBono); // Redondear 
+                            vmBono = viaticopersonaS11.First().Field<decimal?>("bonovariable") ?? 0; // Asigna 0 si es nulo;
                             valorRedondeado = Math.Round(vmBono, 2); // Redondea a un decimal
 
-                            //if (codigoE == 873590)
-                            //{
-                            //    ruptura = 2;
-                            //}
+
+                            // actualiza maestro de empleados para resumen al pie de colilla
+                            fila["TotalPagar"] = vmMontoPrestamo;
+                            fila["Saldo"] = vmSaldoPrestamo;
+                            fila["Ahorro"] = 0.00; // vmAhorro;
+                            fila["Proteccion"] = vmIngresoEspecial;
+                            fila["Bono"] = valorRedondeado;
+                            fila["horasbv"] = vmHrsBV;
                         }
-
-                        // actualiza maestro de empleados para resumen al pie de colilla
-                        fila["TotalPagar"] = vmMontoPrestamo;
-                        fila["Saldo"] = vmSaldoPrestamo;
-                        fila["Ahorro"] = 0.00; // vmAhorro;
-                        fila["Proteccion"] = vmIngresoEspecial;
-                        fila["Bono"] = valorRedondeado;
-                        fila["horasbv"] = vmHrsBV;
-                       
-
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Fecha de ingreso inválida en la fila.");
                     }
                 }
             }
             else
             {
                 Console.WriteLine("La tabla 'ObtenerEmpleadosPlanillaSP' no contiene filas.");
-            }
-
-
-
+            }            
 
             // se llenan columnas de viaticos semana 1 y 2                               
-            
+
             DateTime ini = dtPeriodo[0].fechaini;
             DateTime fin = dtPeriodo[0].fechafin2;
 
@@ -1582,15 +1034,6 @@ namespace NominaRRHH.Presentacion
                                                      // Agregar filas al DataTable usando el método AddViaticosS1Row
                 AddViaticosS1Row(viaticosS1Table, 12345, "Juan Pérez", "Ventas", DateTime.Now, 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 2024);
 
-                //// simulador de viaticos 873463 emerson
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now, 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now.AddDays(1), 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now.AddDays(2), 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now.AddDays(3), 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now.AddDays(4), 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now.AddDays(5), 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-                //AddViaticosS1Row(viaticosS1Table, 873463, "Emerson Mercado", "Modulo 07", DateTime.Now.AddDays(6), 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 533);
-
 
                 resultado.Tables.Add(viaticosS1Table); // Agrega el DataTable vacío
 
@@ -1607,13 +1050,9 @@ namespace NominaRRHH.Presentacion
                 if (ViaticosS2 != null && ViaticosS2.Rows.Count > 0)
                 {
                     ViaticosS2.TableName = "ViaticosS2"; // Asigna el nombre deseado
-                    resultado.Tables.Add(ViaticosS2.Copy()); // Copia para evitar problemas de referencia
-
-                    //var clonedViaticosS2 = ViaticosS2.Clone(); // Clona solo el esquema
-                    //clonedViaticosS2.TableName = "ViaticosS2"; // Asigna el nombre deseado
-                    //resultado.Tables.Add(clonedViaticosS2);    // Agrega el DataTable vacío al DataSet
+                    resultado.Tables.Add(ViaticosS2.Copy()); // Copia para evitar problemas de referencia                  
                 }
-                
+
                 else
                 {
                     // Crear el DataTable
@@ -1640,9 +1079,9 @@ namespace NominaRRHH.Presentacion
                     resultado.Tables.Add(viaticosS2Table); // Agrega el DataTable vacío
                 }
             }
-            
+
             // solo si es catorcenal
-            if (vmTipoPlanilla==1)
+            if (vmTipoPlanilla == 1)
             {
                 ViaticosS2 = dviaticosS2.ObtenerPersonalPagoViatico(int.Parse(periodo1), 2, ini2, fin2, 1, 0, "", tablaEmpleados);
                 if (ViaticosS2 != null && ViaticosS2.Rows.Count > 0)
@@ -1653,7 +1092,7 @@ namespace NominaRRHH.Presentacion
                     // Crear el DataTable
                     DataTable viaticosS1Table = new DataTable("ViaticosS2");
 
-                   
+
                     resultado.Tables.Add(ViaticosS2.Copy()); // Copia para evitar problemas de referencia
                 }
                 else
@@ -1684,9 +1123,6 @@ namespace NominaRRHH.Presentacion
                     resultado.Tables.Add(viaticosS2Table); // Agrega el DataTable vacío
                 }
             }
-
-
-
 
             if (Excel)
             {
@@ -1737,7 +1173,7 @@ namespace NominaRRHH.Presentacion
                         resultadoFiltrado.Tables.Add(periodosClonado);
                     }
                 }
-                if (!resultadoFiltrado.Tables.Contains("ViaticosS1") || resultadoFiltrado.Tables["ViaticosS1"].AsEnumerable().Count()==0) // Evitar error si está vacío
+                if (!resultadoFiltrado.Tables.Contains("ViaticosS1") || resultadoFiltrado.Tables["ViaticosS1"].AsEnumerable().Count() == 0) // Evitar error si está vacío
                 {
                     // Crear el DataTable
                     DataTable viaticosS1Table = new DataTable("ViaticosS1");
@@ -1756,13 +1192,8 @@ namespace NominaRRHH.Presentacion
                     viaticosS1Table.Columns.Add("Cena", typeof(decimal));
                     viaticosS1Table.Columns.Add("Transporte", typeof(decimal));
                     viaticosS1Table.Columns.Add("Periodo", typeof(int));
-                    //ViaticosS1.TableName = "ViaticosS1"; // Asigna el nombre deseado
-                                                         // Agregar el DataTable vacío al DataSet
-                                                         // Agregar filas al DataTable usando el método AddViaticosS1Row
+                   
                     AddViaticosS1Row(viaticosS1Table, 12345, "Juan Pérez", "Ventas", DateTime.Now, 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 2024);
-
-
-
 
                     resultadoFiltrado.Tables.Add(viaticosS1Table); // Agrega el DataTable vacío
                 }
@@ -1785,11 +1216,9 @@ namespace NominaRRHH.Presentacion
                     viaticosS2Table.Columns.Add("Cena", typeof(decimal));
                     viaticosS2Table.Columns.Add("Transporte", typeof(decimal));
                     viaticosS2Table.Columns.Add("Periodo", typeof(int));
-                    //ViaticosS2.TableName = "ViaticosS2"; // Asigna el nombre deseado
-                                                         // Agregar el DataTable vacío al DataSet
-                                                         // Agregar filas al DataTable usando el método AddViaticosS1Row
+
                     AddViaticosS1Row(viaticosS2Table, 12345, "Juan Pérez", "Ventas", DateTime.Now, 100.50m, 200.00m, 50.00m, 10.00m, 20.00m, 5.00m, 15.00m, 30.00m, 2024);
-                    
+
                     resultadoFiltrado.Tables.Add(viaticosS2Table); // Agrega el DataTable vacío
                 }
                 return resultadoFiltrado;
@@ -1799,12 +1228,7 @@ namespace NominaRRHH.Presentacion
 
         }
 
-
-        public static void AddViaticosS1Row(DataTable table, int codigo_empleado, string nombrecompleto, string nombre_depto, DateTime fecha,
-                                           decimal viatico_total, decimal total, decimal saldo,
-                                           decimal Desayuno, decimal Almuerzo,
-                                           decimal Refrigerio, decimal Cena,
-                                           decimal Transporte, int periodo)
+        public static void AddViaticosS1Row(DataTable table, int codigo_empleado, string nombrecompleto, string nombre_depto, DateTime fecha, decimal viatico_total, decimal total, decimal saldo, decimal Desayuno, decimal Almuerzo, decimal Refrigerio, decimal Cena, decimal Transporte, int periodo)
         {
             // Crear una nueva fila
             DataRow row = table.NewRow();
@@ -1830,7 +1254,8 @@ namespace NominaRRHH.Presentacion
 
         private void CrearPDF(string html)
         {
-            try {
+            try
+            {
                 string CodigoDocumento = Convert.ToString(System.Guid.NewGuid().ToString());
                 string fileName = HttpContext.Current.Server.MapPath(".").ToString() + @"\..\Trash\Bolante" + CodigoDocumento.Trim() + ".pdf";
                 //Ultimo
@@ -1844,7 +1269,8 @@ namespace NominaRRHH.Presentacion
                 writer.Close();
                 ShowPdf(HttpContext.Current.Server.MapPath(".").ToString() + @"\..\Trash\Bolante" + CodigoDocumento.Trim() + ".pdf");
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 alertSucces.Visible = false;
                 LblSuccess.Visible = false;
                 alertValida.Visible = true;
@@ -1862,17 +1288,18 @@ namespace NominaRRHH.Presentacion
             Response.Flush();
             Response.Clear();
         }
-      
+
         private string Crear(int filtroemail)
         {
             //empleados pagados en planilla
             string html = "";
-            try {
-                if (TxtBuscar.Text.Trim()=="")
+            try
+            {
+                if (TxtBuscar.Text.Trim() == "")
                 {
                     throw new Exception("Debe especificar periodo");
                 }
-                int tplanilla = 0, semana2 = 2, periodo2= 0;//en caso d consolidar esta variable puede tener semana 1 de otro periodo
+                int tplanilla = 0, semana2 = 2, periodo2 = 0;//en caso d consolidar esta variable puede tener semana 1 de otro periodo
                 DateTime fechaini = new DateTime();
                 DateTime fechafin = new DateTime();
                 dsPlanilla.dtPeriodoDataTable dtPeriodo = NPeriodo.PeriodoSel(Convert.ToInt32(TxtBuscar.Text.Trim()));
@@ -1892,10 +1319,7 @@ namespace NominaRRHH.Presentacion
                         {
                             throw new Exception("Error al consolidar periodo");
                         }
-                        //if (!Neg_Informes.PlnConversionPeriodoConsolidado(Convert.ToInt32(TxtBuscar.Text.Trim()), Convert.ToInt32(txtPeriodo2.Text.Trim()), 1))
-                        //{
-                        //    throw new Exception("Error al convertir periodo");
-                        //}
+                   
                     }
 
                     if (dtPeriodo[0].tperiodo == 1 && dtPeriodo[0].tplanilla == 4)
@@ -1912,15 +1336,15 @@ namespace NominaRRHH.Presentacion
                     }
 
                 }
-                                               
-                DataSet dsEmpleadospln = Neg_Informes.ObtenerEmpleadosPlanilla(TxtBuscar.Text.Trim(),txtPeriodo2.Text,fechaini,fechafin, ddlProceso.SelectedValue.Trim(), TxtCodigoE.Text.Trim(), ChkAll.Checked, ChkEfectivo.Checked,filtroemail,ChkConsolida.Checked, ChkAllEmpleados.Checked);
-               
+
+                DataSet dsEmpleadospln = Neg_Informes.ObtenerEmpleadosPlanilla(TxtBuscar.Text.Trim(), txtPeriodo2.Text, fechaini, fechafin, ddlProceso.SelectedValue.Trim(), TxtCodigoE.Text.Trim(), ChkAll.Checked, ChkEfectivo.Checked, filtroemail, ChkConsolida.Checked, ChkAllEmpleados.Checked);
+
                 if (dsEmpleadospln.Tables.Count > 0)
                 {
                     DataTable dtEmpleadospln = dsEmpleadospln.Tables[0];
                     if (dtPeriodo[0].tperiodo == 3 || dtPeriodo[0].tperiodo == 4 || dtPeriodo[0].tperiodo == 5)//planilla de aguinaldo o vacaciones
                     {
-                        html = Neg_Informes.GenerarComprobantePrestacionPdf(dtEmpleadospln, TxtBuscar.Text.Trim(), periodo2,1, tplanilla, dtPeriodo[0].tperiodo,filtroemail);
+                        html = Neg_Informes.GenerarComprobantePrestacionPdf(dtEmpleadospln, TxtBuscar.Text.Trim(), periodo2, 1, tplanilla, dtPeriodo[0].tperiodo, filtroemail);
                     }
                     else
                     {
@@ -1928,55 +1352,44 @@ namespace NominaRRHH.Presentacion
                         html = Neg_Informes.GenerarComprobantePeriodoPdf(dtEmpleadospln, TxtBuscar.Text.Trim(), periodo2, semana2, tplanilla, dtPeriodo[0].tperiodo, filtroemail, encabezado, ChkConsolida.Checked);
                     }
 
-                  
-                   
-                }
-                //if (ChkConsolida.Checked)//reporte consolidad dos periodos
-                //{
-                //    if (!string.IsNullOrEmpty(txtPeriodo2.Text.Trim()))
-                //    {
-                //        if (!Neg_Informes.PlnConversionPeriodoConsolidado(Convert.ToInt32(TxtBuscar.Text.Trim()), Convert.ToInt32(txtPeriodo2.Text.Trim()), 2))
-                //        {
-                //            throw new Exception("Error al convertir periodo");
-                //        }
-                //    }
 
-                //}
+
+                }
+           
                 return html;
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 throw new Exception(ex.Message);
             }
         }
-       
+
         protected void btnAceptar_Click(object sender, EventArgs e)
         {
-            try {
-                if (TxtBuscar.Text.Trim() != "")
-                {
-                    int filtroeamil = ChkEmail.Checked ? 2 : 1;
-                    // colillas de Pago - version crystal report
-                    if (ChkColilla.Checked)
-                    {
-                        // Crystal Report
-                        // Parametros Consolidar, Tarjeta, Efectivo, Excluir Correos
-                        CrearColilla(filtroeamil);
-                    }
-                    else
-                    {         
-                        // Colilla HTML TO PDF
-                        string html = Crear(filtroeamil);
-                        CrearPDF(html);
-                    }
-
-
-                }
-                else
+            try
+            {
+                if (!(TxtBuscar.Text.Trim() != ""))
                 {
                     throw new Exception("Debe digitar un periodo");
                 }
+                int filtroeamil = ChkEmail.Checked ? 2 : 1;
+                // colillas de Pago - version crystal report
+                if (ChkColilla.Checked)
+                {
+                    // Crystal Report
+                    // Parametros Consolidar, Tarjeta, Efectivo, Excluir Correos
+                    CrearColilla(filtroeamil);
+                }
+                else
+                {
+                    // Colilla HTML TO PDF
+                    string html = Crear(filtroeamil);
+                    CrearPDF(html);
+                }
             }
-            catch (Exception ex) {
+
+            catch (Exception ex)
+            {
                 alertSucces.Visible = false;
                 LblSuccess.Visible = false;
                 alertValida.Visible = true;
@@ -1990,10 +1403,7 @@ namespace NominaRRHH.Presentacion
         }
         protected void ChkEfectivo_CheckedChanged(object sender, EventArgs e)
         {
-            //if (!ChkEmail.Checked)
-            //{
-            //    ChkEfectivo.Checked = false;
-            //}
+           
             if (ChkEfectivo.Checked)
             {
                 ddlProceso.SelectedIndex = -1;
@@ -2010,10 +1420,7 @@ namespace NominaRRHH.Presentacion
 
         protected void ChkAll_CheckedChanged(object sender, EventArgs e)
         {
-            //if (!ChkEmail.Checked)
-            //{
-            //    ChkAll.Checked = false;
-            //}
+
             if (ChkAll.Checked)
             {
                 ddlProceso.SelectedIndex = -1;
@@ -2034,36 +1441,26 @@ namespace NominaRRHH.Presentacion
             {
                 if (TxtBuscar.Text.Trim() != "")
                 {
-                    // TODO:VHPO 17/02/2024
-                    if (ChkColilla.Checked)
-                    {
+                    throw new Exception("Debe digitar un periodo");
+                }
+                // TODO:VHPO 17/02/2024
+                if (ChkColilla.Checked)
+                {
                         // Crystal Report
                         // Parametros Consolidar, Tarjeta, Efectivo, Excluir Correos
-                        CrearColilla(3); // correo
-                                         // email colillas
-                        //if (filtroemail == 3)
-                        //{
+                    CrearColilla(3); // correo
+                           
+                }
+                else
+                {
+                    string html = Crear(3); //correo
 
-                        //}
-                    }
-                    else
-                    {
-                      string html = Crear(3); //correo
-                       
-                    }
-                    // end
-                    //string html = Crear(3);
+                }
+                    
                     alertValida.Visible = false;
                     alertSucces.Visible = true;
                     LblSuccess.Visible = true;
                     LblSuccess.Text = "Se han enviado las colillas de pago a todo el personal con correo";
-
-                    
-                }
-                else
-                {
-                    throw new Exception("Debe digitar un periodo");
-                }
             }
             catch (Exception ex)
             {
@@ -2088,92 +1485,74 @@ namespace NominaRRHH.Presentacion
 
         protected void btnCargar_Click(object sender, EventArgs e)
         {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("codigo_empleado", typeof(int));
             if (file.HasFile)
             {
-                string connectionString = "";
-                string FileName = Path.GetFileName(file.PostedFile.FileName);
-                string Extension = Path.GetExtension(file.PostedFile.FileName);
-                string FolderPath = ConfigurationManager.AppSettings["FolderPath"];
-                string FilePath = Server.MapPath(FileName);
-                string fileLocation = HttpContext.Current.Server.MapPath(".").ToString() + @"\Trash\" + FileName;
-                file.SaveAs(FilePath);
+                DataTable dt = new DataTable();
+                dt.Columns.Add("codigo_empleado", typeof(int));
 
-                if (Extension == ".xls")
+                try
                 {
+                    // Establece el contexto de la licencia de EPPlus
+                    // Para uso no comercial, utiliza LicenseContext.NonCommercial
+                    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 
-                    connectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + FilePath + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=2\"";
-
-                }
-                else if (Extension == ".xlsx")
-                {
-                    connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + FilePath + ";Extended Properties=\"Excel 12.0;HDR=Yes;IMEX=2\"";
-                }
-                connectionString = String.Format(connectionString, FilePath);
-                OleDbConnection connExcel = new OleDbConnection(connectionString);
-                OleDbCommand cmdExcel = new OleDbCommand();
-                cmdExcel.CommandType = System.Data.CommandType.Text;
-                cmdExcel.Connection = connExcel;
-                OleDbDataAdapter oda = new OleDbDataAdapter();
-                connExcel.Open();
-                DataTable dtExcelSchema;
-                dtExcelSchema = connExcel.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-                string SheetName = dtExcelSchema.Rows[0]["TABLE_NAME"].ToString();
-                connExcel.Close();
-
-                //Read Data from First Sheet
-                connExcel.Open();
-                cmdExcel.CommandText = "SELECT * From [" + SheetName + "]";
-                oda.SelectCommand = cmdExcel;
-                oda.Fill(dt);
-                connExcel.Close();
-
-                if (dt.Rows.Count > 0)
-                {
-                    if (dt.Columns.Count == 1)
+                    using (MemoryStream stream = new MemoryStream(file.FileBytes))
                     {
-
-                        if (dt.Columns[0].ToString().ToLower() == "codigo_empleado")
+                        using (ExcelPackage package = new ExcelPackage(stream))
                         {
-                            //foreach (DataRow item in dt.Rows)
-                            //{
-                            //    dt
-                            //}
-                            Session["datos"] = dt;
-                            alertValida.Visible = true;
-                            lblAlert.Visible = true;
-                            lblAlert.Text = "El Archivo esta preparado para procesar Empleados, de click en Imprimir";
-                        }
-                        else
-                        {
-                            alertValida.Visible = true;
-                            lblAlert.Visible = true;
-                            lblAlert.Text = "El Archivo Excel no contiene Nombres de Columnas Requeridos";
-                        }
+                            // Obtiene la primera hoja de trabajo del archivo Excel
+                            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
 
-                    }
-                    else
-                    {
-                        alertValida.Visible = true;
-                        lblAlert.Visible = true;
-                        lblAlert.Text = "El Archivo Excel no contiene las Columnas Requeridas";
-                    }
+                            if (worksheet == null)
+                            {
+                                lblAlert.Text = "El archivo de Excel no contiene ninguna hoja de trabajo.";
+                                alertValida.Visible = true;
+                                return;
+                            }
 
+                            // Verifica que la primera columna se llame 'codigo_empleado'
+                            string firstColumnHeader = worksheet.Cells[1, 1].Value?.ToString().ToLower() ?? "";
+                            if (firstColumnHeader != "codigo_empleado")
+                            {
+                                lblAlert.Text = "El Archivo Excel no contiene Nombres de Columnas Requeridos. Se esperaba 'codigo_empleado'.";
+                                alertValida.Visible = true;
+                                return;
+                            }
+
+                            // Itera a través de las filas de la hoja de trabajo, omitiendo el encabezado (fila 1)
+                            for (int row = 2; row <= worksheet.Dimension.End.Row; row++)
+                            {
+                                object cellValue = worksheet.Cells[row, 1].Value;
+                                if (cellValue != null)
+                                {
+                                    dt.Rows.Add(Convert.ToInt32(cellValue));
+                                }
+                            }
+
+                            if (dt.Rows.Count > 0)
+                            {
+                                Session["datos"] = dt;
+                                lblAlert.Text = "El Archivo está preparado para procesar Empleados, de clic en Imprimir";
+                                alertValida.Visible = true;
+                            }
+                            else
+                            {
+                                lblAlert.Text = "El Archivo Excel no contiene registros.";
+                                alertValida.Visible = true;
+                            }
+                        }
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
+                    lblAlert.Text = "Ocurrió un error al procesar el archivo: " + ex.Message;
                     alertValida.Visible = true;
-                    lblAlert.Visible = true;
-                    lblAlert.Text = "El Archivo Excel no contiene registros";
                 }
             }
-
             else
             {
+                lblAlert.Text = "Favor, seleccione un archivo.";
                 alertValida.Visible = true;
-                lblAlert.Visible = true;
-                lblAlert.Text = "Favor Seleccione un archivo";
                 file.Focus();
             }
         }
@@ -2182,19 +1561,13 @@ namespace NominaRRHH.Presentacion
         {
             if (CheckExcel.Checked)
             {
-                //pnlModulo.Visible = false;
-                //pnlCodigo.Visible = false;
                 divfile.Visible = true;
                 pnlExcel.Visible = true;
-                //divEmp.Visible = false;
             }
             else
             {
-                //pnlModulo.Visible = false;
-                //pnlCodigo.Visible = false;
                 divfile.Visible = false;
                 pnlExcel.Visible = false;
-                //divEmp.Visible = false;
             }
         }
     }
