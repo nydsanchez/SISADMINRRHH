@@ -79,7 +79,7 @@ namespace Negocios
 
         // IR version 2025
         // TODO: Victor Porras
-        public decimal ObtenerIR2025(dsPlanilla.dtIRHistoricoRow hist, decimal IngresoDelPeriodo, bool ocasional, int tipoperiodo, DateTime FecIniPerfiscal, int codigoEmpleado, DateTime FechaCalculo, decimal ingresoporvacaciones, decimal ingresodelperiodobase)
+        public decimal ObtenerIR2025(dsPlanilla.dtIRHistoricoRow hist, decimal IngresoDelPeriodo, bool ocasional, int tipoperiodo, DateTime FecIniPerfiscal, int codigoEmpleado, DateTime FechaCalculo, decimal ingresoporvacaciones)
         {
             decimal IR = default(decimal);
             decimal hingresos = default(decimal);
@@ -93,7 +93,7 @@ namespace Negocios
 
             // Obtener el último día del año
             DateTime FecFinPerfiscal = new DateTime(FecIniPerfiscal.Year, 12, 31);
-            int diasanio = 364;
+            int diasanio = 364; //no esta en dll
 
             // Acumulados del Periodo Fiscal Actual
             if (hist != null)
@@ -130,13 +130,26 @@ namespace Negocios
             // Calcular el ingreso anual
             if (EsPeriodoCompleto) // Suponiendo que EsPeriodoCompleto es un bool+ OtrosIngresos 52_sem
             {
-                ingresoAnual = (IngresoDelPeriodo * 52);
-
-                //ingresoAnual = (IngresoDelPeriodo * semanasRestantes) + SalarioAcumulado;
+                //
+                if (IngresoDelPeriodo > 0)
+                {
+                    ingresoAnual = (IngresoDelPeriodo * 52);
+                }
+                else
+                {
+                    ingresoAnual = (SalarioAcumulado / (52 - semanasRestantes)) * 52; //para calcular la base de IR para vacaciones cuando salario es 0
+                }
             }
             else
             {
-                ingresoAnual = (IngresoDelPeriodo * semanasRestantes) + SalarioAcumulado;
+                if (IngresoDelPeriodo > 0)
+                {
+                    ingresoAnual = (IngresoDelPeriodo * semanasRestantes) + SalarioAcumulado;
+                }
+                else
+                {
+                    ingresoAnual = ((SalarioAcumulado / (52 - semanasRestantes) * semanasRestantes) + SalarioAcumulado);
+                }
             }
             decimal IRVacaciones = 0;
             decimal IRAnual = 0;
@@ -145,14 +158,12 @@ namespace Negocios
             decimal sobreexceso = 0;
             var filaIR = dtTablaIR.AsEnumerable()
                                 .FirstOrDefault(row => ingresoAnual >= (decimal)row["rentadesde"] && ingresoAnual <= (decimal)row["rentahasta"]);
-            
-            
 
             if (filaIR != null)
             {
-                 impuestobase = (decimal)filaIR["ImpuestoBase"];
-                 porcentaje = (decimal)filaIR["PorcentajeAplicable"];
-                 sobreexceso = (decimal)filaIR["SobreExceso"];
+                impuestobase = (decimal)filaIR["ImpuestoBase"];
+                porcentaje = (decimal)filaIR["PorcentajeAplicable"];
+                sobreexceso = (decimal)filaIR["SobreExceso"];
 
                 // solo planilla semanal y catorcenal -- no se incluye quincenal y mensual
                 if (tipoperiodo == 1 || tipoperiodo == 4)
@@ -161,8 +172,6 @@ namespace Negocios
                     {
                         decimal Montodiferencial = (ingresoAnual - SalarioAcumulado);
                         IRAnual = impuestobase + ((Montodiferencial + SalarioAcumulado) - sobreexceso) * (porcentaje / 100m);
-
-                        //IRAnual = impuestobase + (ingresoAnual - sobreexceso) * (porcentaje / 100m);
                     }
                     else
                     {
@@ -174,34 +183,34 @@ namespace Negocios
 
             if (ocasional && tipoperiodo != 1 && ingresoporvacaciones > 0)
             {
-                if (ingresoAnual > 0)
-                {
-                    IRVacaciones = ingresoporvacaciones * (porcentaje / 100m);
-                }
-                else
-                {
-                    decimal porcentajeVac = dtTablaIR.AsEnumerable()
-                                    .Where(row => ingresodelperiodobase >= (decimal)row["rentadesde"] && ingresodelperiodobase <= (decimal)row["rentahasta"])
-                                    .Select(row => (decimal)row["PorcentajeAplicable"])
-                                    .SingleOrDefault();
-                    IRVacaciones = ingresoporvacaciones * (porcentajeVac / 100m);
-                }
+                // if (ingresoAnual > 0)
+                //{
+                IRVacaciones = ingresoporvacaciones * (porcentaje / 100m);
+                //}
+                // else
+                // {
+                //     decimal porcentajeVac = dtTablaIR.AsEnumerable()
+                //                     .Where(row => ingresodelperiodobase >= (decimal)row["rentadesde"] && ingresodelperiodobase <= (decimal)row["rentahasta"])
+                //                     .Select(row => (decimal)row["PorcentajeAplicable"])
+                //                     .SingleOrDefault();
+                //     IRVacaciones = ingresoporvacaciones * (porcentajeVac / 100m);
+                // }
             }
-           
+
             if (ingresoporvacaciones > 0)
             {
-                if (ingresoAnual > 0)
-                {
-                    IRVacaciones = ingresoporvacaciones * (porcentaje / 100m);
-                }
-                else
-                {
-                    decimal porcentajeVac = dtTablaIR.AsEnumerable()
-                                        .Where(row => ingresodelperiodobase >= (decimal)row["rentadesde"] && ingresodelperiodobase <= (decimal)row["rentahasta"])
-                                        .Select(row => (decimal)row["PorcentajeAplicable"])
-                                        .SingleOrDefault();
-                    IRVacaciones = ingresoporvacaciones * (porcentajeVac / 100m);
-                }
+                // if (ingresoAnual > 0)
+                //{
+                IRVacaciones = ingresoporvacaciones * (porcentaje / 100m);
+                //}
+                // else
+                // {
+                //     decimal porcentajeVac = dtTablaIR.AsEnumerable()
+                //                         .Where(row => ingresodelperiodobase >= (decimal)row["rentadesde"] && ingresodelperiodobase <= (decimal)row["rentahasta"])
+                //                         .Select(row => (decimal)row["PorcentajeAplicable"])
+                //                         .SingleOrDefault();
+                //     IRVacaciones = ingresoporvacaciones * (porcentajeVac / 100m);
+                // }
             }
 
 
@@ -214,11 +223,13 @@ namespace Negocios
                 // Calcular IR semanal
                 if (semanasRestantes > 0)
                 {
-                    IR = (IRAnual - IRacumuladoPagado) / semanasRestantes;
+                    IR = (IngresoDelPeriodo > 0)
+                        ? (IRAnual - IRacumuladoPagado) / semanasRestantes
+                        : 0;
                 }
                 else
                 {
-                    IR = IRAnual - IRacumuladoPagado; // Si no hay semanas restantes, no dividir
+                    IR = (IngresoDelPeriodo > 0) ? IRAnual - IRacumuladoPagado : 0; // Si no hay semanas restantes, no dividir y si el ingreso es 0
                 }
             }
 

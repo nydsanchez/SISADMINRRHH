@@ -3387,7 +3387,7 @@ namespace Negocios
                         var filaValida = tablaincxconst.AsEnumerable()
                             .Where(c => prueba >= c.Field<decimal>("dzdesde") && prueba <= c.Field<decimal>("dzhasta"))
                             .FirstOrDefault();
-                        valor = 200;
+                    
                         if (filaValida != null)
                         {
                             // Haz algo con 'filaValida', que es un DataRow
@@ -4742,7 +4742,6 @@ namespace Negocios
                     empincfijo = null;
                     bonoasistencia = default(decimal);
                     bonocalidad = default(decimal);
-                    //operacioncritica = default(decimal);
                     incentivo = default(decimal);
                     incentivorango = default(decimal);
                     amonestaciones = 0;
@@ -4876,7 +4875,7 @@ namespace Negocios
                         
                         if (tablaincX != null) 
                         {
-                            bool asistenciaPerfecta = horasemlab >= (horasperiodo - 0.5m); // máximo 30 min perdidos
+                            bool asistenciaPerfecta = horasperiodo >= (horasemlab - 0.5m); // máximo 30 min perdidos
 
                             if (empincfijo.Length == 0 && asistenciaPerfecta)
                             {
@@ -4896,15 +4895,7 @@ namespace Negocios
                                                   select c).ToArray();
                                 excp = ingdeducexcept.Length;
                             }
-                            //revisar para OPC
-
-                            /*
-                             condicion para las OpC
-                            - operaciones: PM, PC, PT, RF y UH
-                            - eficiencia >= 90%
-                            - asistencia perfecta
-                            - layout completo
-                             */
+                           
                             if (excp == 0 && diasperiodo >= (decimal)dias)
                             {
                                 decimal montoOpC = PlnAsignarIngresoOpCritica(semanaProd, dzEficiencia, operacion);
