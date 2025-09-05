@@ -3381,13 +3381,13 @@ namespace Negocios
                     DataRow[] tablaincxconst = PlnObtenerTablaIncentivo(semanaProd, 1, 2, 0, modulo, docenasperiodo);
                     eficienciaSem = default(decimal);
                     eficienciaSemReal = default(decimal);
-                    decimal prueba = docenasperiodo / dias;
+                    decimal prueba = (dias != 0) ? docenasperiodo / dias : 0;
                     if (tablaincxconst != null && tablaincxconst.Length != 0)
                     {
                         var filaValida = tablaincxconst.AsEnumerable()
                             .Where(c => prueba >= c.Field<decimal>("dzdesde") && prueba <= c.Field<decimal>("dzhasta"))
                             .FirstOrDefault();
-                    
+                       valor = 200;
                         if (filaValida != null)
                         {
                             // Haz algo con 'filaValida', que es un DataRow
@@ -3398,6 +3398,9 @@ namespace Negocios
                         metamaxDia = valor; // 200;                     
 
                         eficienciaSem = Math.Round(docenasperiodo / (metamaxDia * (decimal)dias) * 100m, 2);
+                      /*  eficienciaSem = (metamaxDia != 0 && dias != 0)
+                                        ? Math.Round(docenasperiodo / (metamaxDia * dias) * 100m, 2)
+                                        : 0;*/
                         eficienciaSemReal = eficienciaSem;
                     }
 
@@ -3423,6 +3426,9 @@ namespace Negocios
                         }
                         DataRow[] fechas = datoModR.Where((DataRow c) => c.Field<DateTime>("fecha_producido") == Convert.ToDateTime(dr["fecha_producido"])).ToArray();
                         eficienciaDia = Math.Round(docenastotalDia / metamaxDia, 2) * 100m;
+                        /*eficienciaDia = (metamaxDia != 0)
+                                        ? Math.Round(docenastotalDia / metamaxDia, 2) * 100m
+                                        : 0;*/
                         dtprod.Rows.Add(modulo, dias, eficienciaSem, docenasperiodo, factorDia, Convert.ToDateTime(dr["fecha_producido"]), eficienciaDia, docenaspagarDia, docenaspendDia, docenasprotDia, docenastotalDia, 0, periodo, semana, docenasprodRep, docenasprodAdic, docenasprodCump, eficienciaSemReal);
                     }
                 }
