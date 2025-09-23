@@ -4710,7 +4710,7 @@ namespace Negocios
                 CalidadMod = Session["CalidadMod"] as DataTable;
                 DataTable CumplimientoOQL = Session["CumplimientoOQL"] as DataTable;//quitar
                 decimal bonustiempo = 0.5m;
-                decimal horasemlab = (8m * dias);
+                decimal horasemlab = (9.6m * dias);
                 Neg_DevYDed Neg_DevYDed = new Neg_DevYDed();
                 DateTime finweekend = ((fin.DayOfWeek == DayOfWeek.Friday) ? fin.AddDays(2.0) : ((fin.DayOfWeek != DayOfWeek.Saturday) ? fin : fin.AddDays(1.0)));
                 DataRow[] empincfijo = null;
@@ -4875,7 +4875,7 @@ namespace Negocios
                         
                         if (tablaincX != null) 
                         {
-                            bool asistenciaPerfecta = horasperiodo >= (horasemlab - 0.5m); // máximo 30 min perdidos
+                            bool asistenciaPerfecta = horasperiodo >= (horasemlab - bonustiempo); // máximo 30 min perdidos
 
                             if (empincfijo.Length == 0 && asistenciaPerfecta)
                             {
