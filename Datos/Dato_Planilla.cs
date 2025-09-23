@@ -3510,7 +3510,17 @@ namespace Datos
                 }
                 catch (Exception ex)
                 {
+                 
                     Console.WriteLine(ex.Message);
+                    string rutaArchivo = @"C:\Temp\error_log.txt";
+                    string mensajeError = $"Error al insertar la nómina para la empresa {idEmpresa}. Detalles: {ex.Message}";
+
+                    System.IO.File.AppendAllText(rutaArchivo, mensajeError + Environment.NewLine);
+
+                    // Relanzar la excepción o manejarla de forma más robusta
+                    throw new Exception("Error en la inserción masiva de la nómina.", ex);
+
+                    
                 }
             }
 

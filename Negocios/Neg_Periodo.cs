@@ -111,6 +111,13 @@ namespace Negocios
 			return x.PlnPeriodoFiscalSel(userDetail.getIDEmpresa());
 		}
 
+		public DataTable PlnPeriodoFiscalSelMod()
+		{
+			IUserDetail userDetail = UserDetailResolver.getUserDetail();
+			Dato_Periodo x = new Dato_Periodo();
+			return x.PlnPeriodoFiscalSelMod(userDetail.getIDEmpresa());
+		}
+
 		public DataTable GetPeriodoActual()
 		{
 			Dato_Periodo Dato_Periodo = new Dato_Periodo();

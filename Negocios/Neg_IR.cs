@@ -243,11 +243,145 @@ namespace Negocios
         }
         // End IR 2025
 
-        /// <summary>
-        /// Obtiene la fecha de ingreso de un empleado por su código.
-        /// </summary>
-        /// <param name="codigoEmpleado">Código del empleado</param>
-        /// <returns>Fecha de ingreso del empleado, o null si no se encuentra</returns>
+        // IR version Septiembre 2025 
+        
+        public decimal ObtenerIR2025_V2(dsPlanilla.dtIRHistoricoRow hist, decimal IngresoDelPeriodo, bool ocasional, int tipoperiodo, DateTime FecIniPerfiscal, int codigoEmpleado, DateTime FechaCalculo, decimal ingresoporvacaciones)
+        {
+            decimal IR = default(decimal);
+            decimal hingresos = default(decimal);
+            decimal hdsegurosocial = default(decimal);
+            decimal hdias = default(decimal);
+            decimal hingresosvac = default(decimal);
+            decimal hdsegurosocialvac = default(decimal);
+            decimal hdimpuestos = default(decimal);
+            decimal hdimpuestosvac = default(decimal);
+            decimal IRacumuladoPagado = default(decimal);
+            DateTime fInicioPeriodoPln = FecIniPerfiscal;
+            // Obtener el último día del año
+            DateTime FecFinPerfiscal = FecIniPerfiscal.AddDays(52 * 7 - 1);
+            int diasanio = 364; //no esta en dll
+
+            // Acumulados del Periodo Fiscal Actual
+            if (hist != null)
+            {
+                hingresos = hist.ingresos;
+                hdsegurosocial = hist.dsegurosocial;
+                hdias = hist.dias;
+                hingresosvac = hist.ingresosvac;
+                hdsegurosocialvac = hist.dsegurosocialvac;
+                diasanio = 364 - hist.diasmenos;//revisar
+                hdimpuestos = hist.dimpuestos;
+                hdimpuestosvac = hist.dimpuestosvac;
+            }
+
+
+            IRacumuladoPagado = hdimpuestos;
+
+            DateTime? FechaIngresoLaboral;
+            // obtener fecha de ingreso del empleado
+            FechaIngresoLaboral = ObtenerFechaIngreso(codigoEmpleado);
+
+            // comprobar si es periodo completo
+            bool EsPeriodoCompleto = DeterminarPeriodoCompleto(FechaIngresoLaboral, FecIniPerfiscal);//donde inicio la planilla
+
+            // Declarar las variables necesarias
+            int semanasRestantes;
+            decimal ingresoAnual;
+            decimal SalarioAcumulado;
+            SalarioAcumulado = (hingresos - hdsegurosocial);
+
+            // Calcular semanas restantes redondeando hacia arriba
+           
+            semanasRestantes = (int)Math.Ceiling((FecFinPerfiscal - FechaCalculo).TotalDays / 7); 
+
+            // Calcular el ingreso anual
+            if (EsPeriodoCompleto) // Suponiendo que EsPeriodoCompleto es un bool+ OtrosIngresos 52_sem
+            {
+                // validar si es semana 1 calculo 
+                if (IngresoDelPeriodo > 0)
+                {
+                    if (FechaCalculo == FecIniPerfiscal)
+                    {
+                        ingresoAnual = (IngresoDelPeriodo * 52);
+                    }
+                    else
+                    {
+                       ingresoAnual = (IngresoDelPeriodo * semanasRestantes) + SalarioAcumulado;
+                    }                        
+                }
+                else
+                {
+                    ingresoAnual = (SalarioAcumulado / (52 - semanasRestantes -1)) * 52; //para calcular la base de IR para vacaciones cuando salario es 0
+                }
+            }
+            else
+            {
+                if (IngresoDelPeriodo > 0)
+                {
+                    ingresoAnual = (IngresoDelPeriodo * semanasRestantes) + SalarioAcumulado;
+                }
+                else
+                {
+                    ingresoAnual = ((SalarioAcumulado / (52 - semanasRestantes) * semanasRestantes) + SalarioAcumulado);
+                }
+            }
+            decimal IRVacaciones = 0;
+            decimal IRAnual = 0;
+            decimal impuestobase = 0;
+            decimal porcentaje = 0;
+            decimal sobreexceso = 0;
+            var filaIR = dtTablaIR.AsEnumerable()
+                                .FirstOrDefault(row => ingresoAnual >= (decimal)row["rentadesde"] && ingresoAnual <= (decimal)row["rentahasta"]);
+
+            if (filaIR != null)
+            {
+                impuestobase = (decimal)filaIR["ImpuestoBase"];
+                porcentaje = (decimal)filaIR["PorcentajeAplicable"];
+                sobreexceso = (decimal)filaIR["SobreExceso"];
+
+                // solo planilla semanal y catorcenal -- no se incluye quincenal y mensual
+                if (tipoperiodo == 1 || tipoperiodo == 4)
+                {                   
+                    IRAnual = ((ingresoAnual - sobreexceso) * (porcentaje / 100m)) + impuestobase;   
+                }
+            }
+
+            if (ocasional && tipoperiodo != 1 && ingresoporvacaciones > 0)
+            {
+
+                IRVacaciones = ingresoporvacaciones * (porcentaje / 100m);
+                IR = 0;
+            }
+            else
+            {
+                // Calcular IR semanal
+                if (semanasRestantes > 0)
+                {
+                    IR = (IngresoDelPeriodo > 0)
+                        ? (IRAnual - IRacumuladoPagado) / semanasRestantes
+                        : 0;
+                }
+                else
+                {
+                    IR = (IngresoDelPeriodo > 0) ? IRAnual - IRacumuladoPagado : 0; // Si no hay semanas restantes, no dividir y si el ingreso es 0
+                }
+            }
+
+            if (ingresoporvacaciones > 0)
+            {                
+                IRVacaciones = ingresoporvacaciones * (porcentaje / 100m);             
+            }
+
+            IR += IRVacaciones;
+
+            if (IR < 0m)
+            {
+                IR = default(decimal);
+            }
+            return IR;
+        }
+        // End IR 2025-V2
+      
         public DateTime? ObtenerFechaIngreso(int codigoEmpleado)
         {
             ConnectionRepository conect = new ConnectionRepository();
@@ -302,6 +436,13 @@ namespace Negocios
             IUserDetail userDetail = UserDetailResolver.getUserDetail();
             Dato_IR datIR = new Dato_IR();
             return datIR.ObtenerHistoricoIR(userDetail.getIDEmpresa(), fecha);
+        }
+
+        public dsPlanilla.dtIRHistoricoDataTable ObtenerHistoricoIR2025(DateTime fecha, int periodoInicio)
+        {
+            IUserDetail userDetail = UserDetailResolver.getUserDetail();
+            Dato_IR datIR = new Dato_IR();
+            return datIR.ObtenerHistoricoIR2025(userDetail.getIDEmpresa(), fecha, periodoInicio);
         }
 
         public dsPlanilla.dtIRHistoricoDataTable ObtenerHistoricoIRxE(DateTime fecha, int codigo)

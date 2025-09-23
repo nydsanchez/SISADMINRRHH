@@ -393,14 +393,16 @@ namespace Negocios
                             }
                         }
                         //Ultimos 6 meses                          
-                        DataTable dmAnio;
+                        DataTable dmAnio;  //OBSERVAR AQUI
                         //**********
                         dmAnio = ObtenerMesesPrestaciones(fechaingreso, fechafinmax);
 
+
+                        if (dmAnio != null && dmAnio.Rows.Count > 0)
+                        { 
                         DataRow[] drresult = null;
                         DataTable dm;
-
-                        if (proyectamesi == 0)
+                          if (proyectamesi == 0)
                         {
                             drresult = dmAnio.Select("DIA=TDIASMES");
                         }
@@ -413,7 +415,7 @@ namespace Negocios
                             dm = drresult.OrderByDescending(row => Convert.ToInt32(row["Anio"])).ThenByDescending(row => Convert.ToInt32(row["Mes"])).Take(6).CopyToDataTable();
                         else//***************
                             dm = dmAnio.Rows.Cast<DataRow>().OrderByDescending(row => Convert.ToInt32(row["Anio"])).ThenByDescending(row => Convert.ToInt32(row["Mes"])).CopyToDataTable();
-
+                       
                         if (dp.Rows.Count > 0)
                             TipoSalario = Convert.ToInt32(dp.Rows[0]["tiposalario"].ToString());
                         else//empleados que no se han reportado en planilla 
@@ -593,8 +595,18 @@ namespace Negocios
                                 matrizliq.Rows[i]["PromedioDias"] = Math.Round(salariomensual, 2) / 30.0;
                             }
                         }
+                        }
+
+
+
+                          
+
+                        
                     }
                     ///Por ser quincenal y ser meses completos,no hay necesidad de desglozar los dias ,ver procedimiento spmatrizliqQuincenal.
+                    
+                    
+                    
                     if (deDatos.Rows[0][6].ToString() == "3")
                         matrizliq = spmatrizliqQuincenal(codEmpl);
 

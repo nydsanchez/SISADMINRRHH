@@ -220,8 +220,11 @@ namespace Negocios
                 Neg_IR NIR = new Neg_IR();
                 DataTable df = new DataTable();
                 Neg_Periodo neg_Periodo = new Neg_Periodo();
-                DataTable periodoFiscal = neg_Periodo.PlnPeriodoFiscalSel();
+                DataTable periodoFiscal = neg_Periodo.PlnPeriodoFiscalSelMod(); //revisar donde se usa
                 DateTime inicioano = Convert.ToDateTime(periodoFiscal.Rows[0]["fechaini"]);
+                DateTime inicioanoPl = Convert.ToDateTime(periodoFiscal.Rows[0]["fechaIniPl"]);
+
+                int periodoPL = Convert.ToInt32(periodoFiscal.Rows[0]["periodoini"]);
                 df = Dato_Factores.obtenerFactor(userDetail.getIDEmpresa());
                 decimal factorInss = Convert.ToDecimal(df.Rows[1]["factor"].ToString());
                 decimal factorPatronal = Convert.ToDecimal(df.Rows[2]["factor"].ToString());
@@ -229,7 +232,13 @@ namespace Negocios
                 dsPlanilla.dtPlanillaDataTable dtPlanilla = new dsPlanilla.dtPlanillaDataTable();
                 dtDeduccionCuota = new dsPlanilla.dtDeduccionCuotaDataTable();
                 dtIngrDeduc = new dsPlanilla.dtIngrDeducDataTable();
-                dsPlanilla.dtIRHistoricoDataTable dtIRHistorico = NIR.ObtenerHistoricoIR(inicioano);
+
+                //OPTIMIZACION PARA OBTENER EL HISTORICO DEL IR
+
+                var irHistoricoDictionary = NIR.ObtenerHistoricoIR2025(inicioano, periodoPL)
+            .AsEnumerable().ToDictionary(row => row.codigo_empleado);
+
+                //dsPlanilla.dtIRHistoricoDataTable dtIRHistorico = NIR.ObtenerHistoricoIR2025(inicioano,periodoPL );
                 //dtIRHistoricoDataTable = neg_IR.ObtenerHistoricoIRV2(fecha, fechafin); 
                 int q = 0;
                 int e = 0;
@@ -248,7 +257,7 @@ namespace Negocios
                 decimal ingresosalario = default(decimal);
                 decimal salariomensual = default(decimal);
                 decimal salariopromedio = default(decimal);
-                decimal salariodiario = default(decimal); 
+                decimal salariodiario = default(decimal);
                 decimal vacdesc = default(decimal);
                 decimal vacpag = default(decimal);
                 decimal horastrabajadas = default(decimal);
@@ -259,40 +268,62 @@ namespace Negocios
                 DateTime fechadefault = new DateTime(1900, 1, 1, 0, 0, 0);
                 DateTime fechagraba = DateTime.Now;
                 Neg_Marca NMarca = new Neg_Marca();
-                List<Neg_Empleados> Empleados = NMarca.ObtenerHT(periodo, semana, dtPeriodo[0].ubicacion, userDetail.getIDEmpresa());
+                List<Neg_Empleados> EmpleadosConDuplicados = NMarca.ObtenerHT(periodo, semana, dtPeriodo[0].ubicacion, userDetail.getIDEmpresa());
+
+                List<Neg_Empleados> Empleados = EmpleadosConDuplicados
+                .GroupBy(emplead => emplead.codigo_empleado)
+                .Select(g => g.First())
+                .ToList();
+
                 DataSet pasivo = new DataSet();
                 bool existepasivo = false;
-                for (int i = 0; i < Empleados.Count; i++)
+
+                var ingresosPorEmpleado = dtIngresos
+           .GroupBy(i => i.codigo_empleado)
+           .ToDictionary(g => g.Key, g => g.ToList());
+
+                var egresosPorEmpleado = dtEgresos
+          .GroupBy(emp => emp.codigo_empleado)
+          .ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var empleado in Empleados)
                 {
+
                     dsPlanilla.dtPlanillaRow NewPlanilla = dtPlanilla.NewdtPlanillaRow();
                     salariomensual = default(decimal);
                     ingresovacaciones = default(decimal);
                     salariopromedio = default(decimal);
-                    salariodiario = default(decimal); 
+                    salariodiario = default(decimal);
                     existepasivo = false;
-                    vacdesc = Convert.ToDecimal(Empleados[i].horasv);
+                    DateTime fIngresoEmpVal = empleado.fecheingreso;
+                    
+
+                    vacdesc = Convert.ToDecimal(empleado.horasv);
                     if (DetEmpresas.Rows.Count > 0)
                     {
-                        salariomensual = ((Empleados[i].moneda == Convert.ToInt32(DetEmpresas[0].moneda)) ? Empleados[i].salariomensual : (Empleados[i].salariomensual * dtPeriodo[0].factor));
-                       salariodiario = salariomensual / 30m;
+                        salariomensual = ((empleado.moneda == Convert.ToInt32(DetEmpresas[0].moneda)) ? empleado.salariomensual : (empleado.salariomensual * dtPeriodo[0].factor));
+                        salariodiario = salariomensual / 30m;
                         if (DetEmpresas[0].promvac && vacdesc > 0m)
                         {
-                            horastrabajadas = Convert.ToDecimal(Empleados[i].horasapagar) - vacdesc;
+                            horastrabajadas = Convert.ToDecimal(empleado.horasapagar) - vacdesc;
                             Neg_Liquidacion.Globales.fechaR = fechainicio.AddDays(-1.0);
-                            if (Empleados[i].tiposalario != 1)
+                            if (empleado.tiposalario != 1)
                             {
-                                pasivo = Neg_Liquidacion.ObtenerDatosLiquidacion(Empleados[i].codigo_empleado, 0, 0, 0.0, 0, 0, pago: true);
-                                if (pasivo != null && pasivo.Tables.Count > 0 && pasivo.Tables[0].Rows.Count > 0)
-                                {
-                                    existepasivo = true;
-                                    salariopromedio = Convert.ToDecimal(pasivo.Tables[1].Rows[0]["salPromedioDia"]);
-                                }
+                                //if (fIngresoEmpVal <= fechainicio) //usado para recrear todas las planillas desde 536 
+                                //{
+                                    pasivo = Neg_Liquidacion.ObtenerDatosLiquidacion(empleado.codigo_empleado, 0, 0, 0.0, 0, 0, pago: true);
+                                    if (pasivo != null && pasivo.Tables.Count > 0 && pasivo.Tables[0].Rows.Count > 0)
+                                    {
+                                        existepasivo = true;
+                                        salariopromedio = Convert.ToDecimal(pasivo.Tables[1].Rows[0]["salPromedioDia"]);
+                                    }
+                               // }
                             }
                             if (salariopromedio <= 0m)
                             {
                                 salariopromedio = salariodiario;
                             }
-                            if (!existepasivo || Empleados[i].tiposalario == 1)
+                            if (!existepasivo || empleado.tiposalario == 1)
                             {
                                 salariopromedio = salariomensual / 30m;
                             }
@@ -300,16 +331,16 @@ namespace Negocios
                         }
                         else
                         {
-                            horastrabajadas = Convert.ToDecimal(Empleados[i].horasapagar);
+                            horastrabajadas = Convert.ToDecimal(empleado.horasapagar);
                         }
                     }
                     horastrabajadas = ((horastrabajadas < 0m) ? 0m : horastrabajadas);
-                    NewPlanilla.codigo_empleado = Empleados[i].codigo_empleado;
+                    NewPlanilla.codigo_empleado = empleado.codigo_empleado;
                     NewPlanilla.fechaini = fechainicio;
                     NewPlanilla.fechafin = fechafin;
                     NewPlanilla.messemana = fechafin.Month;
                     NewPlanilla.semana = semana;
-                    NewPlanilla.nombre = Empleados[i].nombrecompleto;
+                    NewPlanilla.nombre = empleado.nombrecompleto;
                     NewPlanilla.periodo = periodo;
                     NewPlanilla.anio = fechafin.Year;
                     NewPlanilla.dimpuestos = 0m;
@@ -322,15 +353,15 @@ namespace Negocios
                     NewPlanilla.tperiodo = dtPeriodo[0].tperiodo;
                     NewPlanilla.tplanilla = dtPeriodo[0].tplanilla;
                     NewPlanilla.fechagraba = fechagraba;
-                    NewPlanilla.nombre_depto = Empleados[i].departamento;
+                    NewPlanilla.nombre_depto = empleado.departamento;
                     NewPlanilla.usuariograba = user;
-                    NewPlanilla.codigo_cargo = Empleados[i].codigo_cargo;
-                    NewPlanilla.codigo_depto = Empleados[i].codigo_depto;
-                    NewPlanilla.saldo_vacaciones = Empleados[i].saldo_vacaciones;
-                    NewPlanilla.nombre_cargo = Empleados[i].cargo;
+                    NewPlanilla.codigo_cargo = empleado.codigo_cargo;
+                    NewPlanilla.codigo_depto = empleado.codigo_depto;
+                    NewPlanilla.saldo_vacaciones = empleado.saldo_vacaciones;
+                    NewPlanilla.nombre_cargo = empleado.cargo;
                     NewPlanilla.horast = horastrabajadas;
                     NewPlanilla.ingresosnograbables = 0m;
-                    NewPlanilla.p = Empleados[i].p;
+                    NewPlanilla.p = empleado.p;
                     ingresosgrabables = default(decimal);
                     ingresosalario = default(decimal);
                     ingresosnograbables = default(decimal);
@@ -341,7 +372,7 @@ namespace Negocios
                     beneficio = default(decimal);
                     ingresohcgs = default(decimal);
                     ingresoht = default(decimal);
-                    if (Empleados[i].tipocontrato == 7)
+                    if (empleado.tipocontrato == 7)
                     {
                         ingresosgrabables = default(decimal);
                         ingresosalario = default(decimal);
@@ -350,7 +381,7 @@ namespace Negocios
                     }
                     else
                     {
-                        //ingresosalario = horastrabajadas * (salariomensual * 0.0041095890411m);
+
                         ingresosalario = horastrabajadas * (salariomensual / 30 / 8m);
                         ingresosgrabables = ingresosalario + ingresovacaciones;
                         if (DetEmpresas[0].promvac && vacdesc > 0m)
@@ -358,7 +389,7 @@ namespace Negocios
                             dsPlanilla.dtIngrDeducRow newingrdeduc = dtIngrDeduc.NewdtIngrDeducRow();
                             newingrdeduc.id = 0;
                             newingrdeduc.id_tipo = 1;
-                            newingrdeduc.codigo_empleado = Empleados[i].codigo_empleado;
+                            newingrdeduc.codigo_empleado = empleado.codigo_empleado;
                             newingrdeduc.nsemana = semana;
                             newingrdeduc.tipoingrdeduc = 17;
                             newingrdeduc.periodo = periodo;
@@ -371,32 +402,21 @@ namespace Negocios
                     NewPlanilla.salario = ingresosalario;
                     q = 0;
                     int banderav = 0;
-                    for (; q < dtIngresos.Rows.Count; q++)
+
+
+                    if (ingresosPorEmpleado.TryGetValue(empleado.codigo_empleado, out var listaIngresos))
                     {
-                        if (Empleados[i].codigo_empleado == dtIngresos[q].codigo_empleado && dtIngresos[q].id_tipo == 1)
-                        {
-                            if (dtIngresos[q].aplicainss && dtIngresos[q].aplicair)
-                            {
-                                ingresosgrabables += dtIngresos[q].valor;
-                                continue;
-                            }
-                            ingresosnograbables += (dtIngresos[q].mostrarc ? dtIngresos[q].valor : 0m);
-                            if (dtIngresos[q].aplicadeduc)
-                            {
-                                ingresosnogrvdeduc += dtIngresos[q].valor;
-                            }
-                            if (dtIngresos[q].regEspecial)
-                            {
-                                ingresosnocontar += dtIngresos[q].valor;
-                            }
-                        }
-                        else if (Empleados[i].codigo_empleado < dtIngresos[q].codigo_empleado)
-                        {
-                            break;
-                        }
+                        ingresosgrabables += listaIngresos
+                            .Where(i => i.id_tipo == 1 && i.aplicainss && i.aplicair)
+                            .Sum(i => i.valor);
+
+                        ingresosnograbables += listaIngresos
+                            .Where(i => i.id_tipo == 1 && !(i.aplicainss && i.aplicair) && i.mostrarc)
+                            .Sum(i => i.valor);
                     }
+
                     NewPlanilla.ingresos = ingresosgrabables;
-                    if (Empleados[i].tipocontrato == 1 || Empleados[i].tipocontrato == 5)
+                    if (empleado.tipocontrato == 1 || empleado.tipocontrato == 5)
                     {
                         NewPlanilla.dsegurosocial = factorInss / 100m * ingresosgrabables;
                         NewPlanilla.dseguropatronal = ingresosgrabables * factorPatronal;
@@ -409,90 +429,85 @@ namespace Negocios
                     NewPlanilla.ingresosnograbables = ingresosnograbables;
                     NewPlanilla.egresos += NewPlanilla.dsegurosocial;
                     k = 0;
-                    //if (Empleados[i].codigo_empleado == 309811)
-                    //{
-                    //}
-                    if (Empleados[i].tipocontrato == 1 || Empleados[i].tipocontrato == 5)
-                    {
-                        if (k < dtIRHistorico.Rows.Count)
-                        {
-                            // ESTABLECE EL FLUJO de codigo para empleado.
-                            for (; k < dtIRHistorico.Rows.Count && Empleados[i].codigo_empleado > dtIRHistorico[k].codigo_empleado; k++)
-                            {
-                            }
 
-                            if (k < dtIRHistorico.Rows.Count)
-                            {
-                                if (Empleados[i].codigo_empleado == dtIRHistorico[k].codigo_empleado)
-                                {
-                                    decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
-                                    NewPlanilla.dimpuestos = NIR.ObtenerIR2025(dtIRHistorico[k], ingresosdelperiodo - ingresovacaciones, ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones);
-                                    k++;
-                                }
-                            }
-                            else
-                            {
-                                decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
-                                NewPlanilla.dimpuestos = NIR.ObtenerIR2025(null, (ingresosdelperiodo - ingresovacaciones), ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones);
-                            }
+                    if (empleado.tipocontrato == 1 || empleado.tipocontrato == 5)
+                    {
+                        DateTime fechaInicioReal = inicioano > inicioanoPl ? inicioanoPl : inicioano;
+
+                        if (irHistoricoDictionary.TryGetValue(empleado.codigo_empleado, out var historicoEmpleado))
+                        {
+                            decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
+                            NewPlanilla.dimpuestos = NIR.ObtenerIR2025_V2(historicoEmpleado, ingresosdelperiodo - ingresovacaciones, ocasional: false, dtPeriodo[0].tperiodo, fechaInicioReal, empleado.codigo_empleado, fechainicio, ingresovacaciones);
                         }
+
                         else
                         {
                             decimal ingresosdelperiodo = ingresosgrabables - NewPlanilla.dsegurosocial;
-                          
-                            NewPlanilla.dimpuestos = NIR.ObtenerIR2025(null, (ingresosdelperiodo - ingresovacaciones) , ocasional: false, dtPeriodo[0].tperiodo, inicioano, Empleados[i].codigo_empleado, fechainicio, ingresovacaciones);
+                            NewPlanilla.dimpuestos = NIR.ObtenerIR2025_V2(null, (ingresosdelperiodo - ingresovacaciones), ocasional: false, dtPeriodo[0].tperiodo, fechaInicioReal, empleado.codigo_empleado, fechainicio, ingresovacaciones);
                         }
+
                     }
                     else
                     {
                         decimal factorServicios = default(decimal);
-                        factorServicios = ((Empleados[i].tipocontrato != 3) ? Convert.ToDecimal(df.Rows[5]["factor"].ToString()) : Convert.ToDecimal(df.Rows[4]["factor"].ToString()));
+                        factorServicios = ((empleado.tipocontrato != 3) ? Convert.ToDecimal(df.Rows[5]["factor"].ToString()) : Convert.ToDecimal(df.Rows[4]["factor"].ToString()));
                         NewPlanilla.dimpuestos = ingresosgrabables * factorServicios;
                     }
                     NewPlanilla.egresos += NewPlanilla.dimpuestos;
 
-                    int existe = NDevyDed.verificaDeduccionPrioridad(Empleados[i].codigo_empleado);
+                    int existe = NDevyDed.verificaDeduccionPrioridad(empleado.codigo_empleado);
 
                     e = 0;
                     ingresomenosimpuesto = NewPlanilla.ingresos - NewPlanilla.egresos + ingresosnogrvdeduc;
                     ingresodisponible = ingresomenosimpuesto;
-                    if (Empleados[i].estado != 1 || existe > 0)
+                    if (empleado.estado != 1 || existe > 0)
                     {
                         ingresodisponible = ingresomenosimpuesto;
                     }
-                    for (; e < dtEgresos.Rows.Count; e++)
+
+                    // **OPTIMIZACIÓN 3: Uso de LINQ para egresos**
+                    if (egresosPorEmpleado.TryGetValue(empleado.codigo_empleado, out var listaEgresos))
                     {
-                        if (Empleados[i].codigo_empleado == dtEgresos[e].codigo_empleado && dtEgresos[e].id_tipo != 1 && dtEgresos[e].deduccionibruto == 0)
+                        var egresosFiltrados = listaEgresos
+                            .Where(eg => eg.id_tipo != 1 && eg.deduccionibruto == 0)
+                            .OrderBy(eg => eg.idprioridad)
+                            .ToList();
+
+                        foreach (var egreso in egresosFiltrados)
                         {
+
                             Neg_Planilla deduccion = new Neg_Planilla();
-                            deduccion.id = dtEgresos[e].id;
-                            deduccion.id_tipo = dtEgresos[e].id_tipo;
-                            deduccion.codigo_empleado = dtEgresos[e].codigo_empleado;
-                            deduccion.nsemana = dtEgresos[e].nsemana;
-                            deduccion.ultimoperiodo = dtEgresos[e].periodo;
-                            deduccion.tipoingrdeduc = dtEgresos[e].tipoingrdeduc;
-                            deduccion.valor = dtEgresos[e].valor;
-                            deduccion.porcentual = dtEgresos[e].porcentual;
-                            deduccion.modalidad = dtEgresos[e].modalidad;
-                            deduccion.recurrente = dtEgresos[e].recurrente;
-                            deduccion.idprioridad = dtEgresos[e].idprioridad;
-                            deduccion.debe = dtEgresos[e].debe;
-                            deduccion.pagopendiente = dtEgresos[e].pagopendiente;
-                            deduccion.ultimacuota = dtEgresos[e].ultimacuota;
+                            deduccion.id = egreso.id;
+                            deduccion.id_tipo = egreso.id_tipo;
+                            deduccion.codigo_empleado = egreso.codigo_empleado;
+                            deduccion.nsemana = egreso.nsemana;
+                            deduccion.ultimoperiodo = egreso.periodo;
+                            deduccion.tipoingrdeduc = egreso.tipoingrdeduc;
+                            deduccion.valor = egreso.valor;
+                            deduccion.porcentual = egreso.porcentual;
+                            deduccion.modalidad = egreso.modalidad;
+                            deduccion.recurrente = egreso.recurrente;
+                            deduccion.idprioridad = egreso.idprioridad;
+                            deduccion.debe = egreso.debe;
+                            deduccion.pagopendiente = egreso.pagopendiente;
+                            deduccion.ultimacuota = egreso.ultimacuota;
+
                             egresoplanilla += procesarDeducciones(deduccion, periodo, semana, Math.Round(ingresodisponible - egresoplanilla, 2), Math.Round(NewPlanilla.ingresos + ingresosnogrvdeduc - ingresosnocontar, 2), "g", 0, bandera, dtDeduccionCuota);
                         }
-                        else if (Empleados[i].codigo_empleado < dtEgresos[e].codigo_empleado)
-                        {
-                            break;
-                        }
                     }
+
+
                     NewPlanilla.egresos += egresoplanilla;
                     NewPlanilla.neto = NewPlanilla.ingresos - NewPlanilla.egresos + ingresosnograbables;
                     if ((NewPlanilla.ingresos > 0m || NewPlanilla.ingresosnograbables > 0m) && bandera == 0 && !NewPlanilla.p)
                     {
                         dtPlanilla.AdddtPlanillaRow(NewPlanilla);
                     }
+
                 }
+
+               
+
                 Dato_Planilla D_Planilla = new Dato_Planilla();
                 D_Planilla.PlnplanillasInsBulk(userDetail.getIDEmpresa(), dtPlanilla);
                 RegistrarIngresoVacDesc(dtIngrDeduc, user);
@@ -504,6 +519,8 @@ namespace Negocios
             }
             return "T";
         }
+
+
         //AGREGADO POR GRETHEL TERCERO 28/11/16
         public decimal procesarDeducciones(Neg_Planilla deduccion, int periodo, int semana, decimal ingresosdisponible, decimal ingreso, string proceso, int existe, int reproceso, dsPlanilla.dtDeduccionCuotaDataTable dtDeduccionCuota)
         {

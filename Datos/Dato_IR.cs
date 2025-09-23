@@ -69,5 +69,42 @@ namespace Datos
 
             return dt;
         }
+
+        public dsPlanilla.dtIRHistoricoDataTable ObtenerHistoricoIR2025(int idempresa, DateTime fecha, int periodoInicio)
+        {
+            dsPlanilla.dtIRHistoricoDataTable dt = new dsPlanilla.dtIRHistoricoDataTable();
+
+            ConnectionRepository conect = new ConnectionRepository();
+            SqlConnection sqlConnection = conect.getConnection(idempresa);
+
+            System.Data.SqlClient.SqlCommand cmd = new SqlCommand();
+            System.Data.SqlClient.SqlParameter p = new SqlParameter("@fecha", System.Data.SqlDbType.Date);
+            p.Value = fecha;
+            cmd.Parameters.Add(p);
+
+            System.Data.SqlClient.SqlParameter p2 = new SqlParameter("@periodoInicio", System.Data.SqlDbType.Int);
+            p2.Value = periodoInicio;
+            cmd.Parameters.Add(p2);
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "plnplanillasIRhist-2025";
+            cmd.Connection = sqlConnection;
+
+            System.Data.SqlClient.SqlDataAdapter da = new SqlDataAdapter(cmd);
+
+            try
+            {
+                da.Fill(dt);
+            }
+            catch (System.Data.SqlClient.SqlException ex)
+            {
+                string x = ex.Message;
+
+                if (cmd.Connection.State != ConnectionState.Closed)
+                    cmd.Connection.Close();
+            }
+
+            return dt;
+        }
     }
 }

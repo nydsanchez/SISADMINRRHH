@@ -482,5 +482,29 @@ namespace Datos
             }
             return dt;
         }
+
+        public DataTable PlnPeriodoFiscalSelMod(int idEmpresa)
+        {
+            SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "PlnPeriodoFiscalSel_Mod2025";
+            cmd.Connection = sqlConnection;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            try
+            {
+                da.Fill(dt);
+            }
+            catch (SystemException)
+            {
+                if (cmd.Connection.State != 0)
+                {
+                    cmd.Connection.Close();
+                }
+                return dt;
+            }
+            return dt;
+        }
     }
 }
