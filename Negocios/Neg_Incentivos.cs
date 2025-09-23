@@ -3753,19 +3753,13 @@ namespace Negocios
                                   select c).ToArray();
                 if (tablaincxconst != null && tablaincxconst.Length != 0)
                 {
-                      /*TODO:VHPO
-                    
-                      // metamaxSem = tablaincxconst.Max((DataRow c) => c.Field<decimal>("dzdesde"));
-                      //eficienciaSem = Math.Round(docenasperiodo / (metamaxSem * (decimal)dias) * 100m, 2);*/
+                      
                         var fila = tablaincxconst.FirstOrDefault(c => c.Field<decimal>("eficienciadesde") == 100);
                         decimal metaxSem = fila != null ? fila.Field<decimal>("DzDesde") : 1000m;       
                         
                          eficienciaSem = Math.Round ((docenasperiodo / metaxSem) * 100);
 
-                       /*  //hacer condicion de pagar o no bonoasistencia si asistencia >= (48m - 0.5) && eficienciasemana > 90 buscar la tabla y mandar el bono de asistencia
-                        o retornar buscar la fila que coincida con la eficiencia
-                     */
-
+                     
                                       
                     if (eficienciaSem < 90m && areaModList != null && areaModList.Length != 0)
                     {
@@ -4716,7 +4710,7 @@ namespace Negocios
                 CalidadMod = Session["CalidadMod"] as DataTable;
                 DataTable CumplimientoOQL = Session["CumplimientoOQL"] as DataTable;//quitar
                 decimal bonustiempo = 0.5m;
-                decimal horasemlab = 48m;
+                decimal horasemlab = (8m * dias);
                 Neg_DevYDed Neg_DevYDed = new Neg_DevYDed();
                 DateTime finweekend = ((fin.DayOfWeek == DayOfWeek.Friday) ? fin.AddDays(2.0) : ((fin.DayOfWeek != DayOfWeek.Saturday) ? fin : fin.AddDays(1.0)));
                 DataRow[] empincfijo = null;
@@ -4886,7 +4880,7 @@ namespace Negocios
                             if (empincfijo.Length == 0 && asistenciaPerfecta)
                             {
                                 // Procesar el resultado encontrado
-                                bonoasistencia = tablaincX.Field<decimal>("bonoasist"); // Acceder 
+                                bonoasistencia = (tablaincX.Field<decimal>("bonoasist") * dias) / 5; // Acceder 
                             }
 
                             else
