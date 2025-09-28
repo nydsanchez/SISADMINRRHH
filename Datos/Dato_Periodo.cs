@@ -16,7 +16,7 @@ namespace Datos
         ConnectionRepository ConnectionRepository = new ConnectionRepository();
         #endregion
         public bool AgregarPeriodo(int nperiodo, int ubicacion, int mesSem1, DateTime desdeSem1,
-            DateTime hastaSem1, int mesSem2, DateTime desdeSem2, DateTime hastaSem2, int tPeriodo, string user, int tipoPlanilla, bool consolidar,decimal factor, int idEmpresa)
+            DateTime hastaSem1, int mesSem2, DateTime desdeSem2, DateTime hastaSem2, int tPeriodo, string user, int tipoPlanilla, bool consolidar, decimal factor, int idEmpresa)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
             CnBD con = new CnBD();
@@ -81,6 +81,102 @@ namespace Datos
         }
 
 
+        public bool AgregarPeriodoFiscal(int nperiodo, DateTime fechaInicio, int anioFiscal, string user, int idEmpresa, out string mensajeError)
+        {
+            SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
+            CnBD con = new CnBD();
+            System.Data.SqlClient.SqlCommand cmd = new SqlCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "PlnPeriodoFiscalIns";
+            cmd.Connection = sqlConnection;
+
+            System.Data.SqlClient.SqlParameter p2 = new SqlParameter("@nperiodo", System.Data.SqlDbType.Int);
+            p2.Value = nperiodo;
+            cmd.Parameters.Add(p2);
+
+            System.Data.SqlClient.SqlParameter p3 = new SqlParameter("@fechaInicio", System.Data.SqlDbType.Date);
+            p3.Value = fechaInicio;
+            cmd.Parameters.Add(p3);
+
+            System.Data.SqlClient.SqlParameter p4 = new SqlParameter("@anioFiscal", System.Data.SqlDbType.Int);
+            p4.Value = anioFiscal;
+            cmd.Parameters.Add(p4);
+
+
+            System.Data.SqlClient.SqlParameter p11 = new SqlParameter("@user", System.Data.SqlDbType.NVarChar);
+            p11.Value = user;
+            cmd.Parameters.Add(p11);
+
+            mensajeError = string.Empty;
+
+            try
+            {
+                cmd.Connection.Open();
+                cmd.ExecuteNonQuery();
+                cmd.Connection.Close();
+            }
+            catch (System.Data.SqlClient.SqlException ex)
+            {
+                mensajeError = ex.Message;
+                if (cmd.Connection.State != ConnectionState.Closed)
+                    cmd.Connection.Close();
+                return false;
+            }
+            catch (SystemException)
+            {
+
+                mensajeError = "Error de conexión o sistema desconocido.";
+                if (cmd.Connection.State != ConnectionState.Closed)
+                    cmd.Connection.Close();
+                return false;
+            }
+            return true;
+        }
+        
+        public bool CerrarPeriodoFiscal(int anioFiscal, string user, int idEmpresa, out string mensajeError)
+        {
+            SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
+            System.Data.SqlClient.SqlCommand cmd = new SqlCommand();
+            CnBD con = new CnBD();
+
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "PlnPeriodoFiscalClose";
+            cmd.Connection = sqlConnection;
+
+            System.Data.SqlClient.SqlParameter p2 = new SqlParameter("@anioFiscal", System.Data.SqlDbType.Int);
+            p2.Value = anioFiscal;
+            cmd.Parameters.Add(p2);
+
+            System.Data.SqlClient.SqlParameter p11 = new SqlParameter("@user", System.Data.SqlDbType.VarChar);
+            p11.Value = user;
+            cmd.Parameters.Add(p11);
+            mensajeError = string.Empty;
+
+            try
+            {
+                cmd.Connection.Open();
+                cmd.ExecuteNonQuery();
+                cmd.Connection.Close();
+            }
+            catch (System.Data.SqlClient.SqlException ex)
+            {
+
+                mensajeError = ex.Message;
+                if (cmd.Connection.State != ConnectionState.Closed)
+                    cmd.Connection.Close();
+                return false;
+            }
+            catch (SystemException)
+            {
+
+                mensajeError = "Error de conexión o sistema desconocido.";
+                if (cmd.Connection.State != ConnectionState.Closed)
+                    cmd.Connection.Close();
+                return false;
+            }
+
+            return true;
+        }
         public bool CerrarPeriodo(int nperiodo, string user, int idEmpresa, int tipoPlanilla)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
@@ -93,7 +189,7 @@ namespace Datos
             System.Data.SqlClient.SqlParameter p2 = new SqlParameter("@nperiodo", System.Data.SqlDbType.Int);
             p2.Value = nperiodo;
             cmd.Parameters.Add(p2);
-          
+
             System.Data.SqlClient.SqlParameter p11 = new SqlParameter("@user", System.Data.SqlDbType.VarChar);
             p11.Value = user;
             cmd.Parameters.Add(p11);
@@ -150,7 +246,7 @@ namespace Datos
 
             return "";
         }
-        
+
         public bool AgregarPeriodoXFecha(int nperiodo, int ubicacion, int mes, DateTime fechaIni, DateTime fechaF, int tPeriodo, string user, int idEmpresa)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
@@ -256,7 +352,7 @@ namespace Datos
             return true;
         }
 
-        public bool AgregarPeriodoVacaciones(int nperiodo, int ubicacion, int mesSemana, DateTime desde, DateTime hasta, int tperiodo, string user, int tipoPlanilla,decimal factor, int idEmpresa)
+        public bool AgregarPeriodoVacaciones(int nperiodo, int ubicacion, int mesSemana, DateTime desde, DateTime hasta, int tperiodo, string user, int tipoPlanilla, decimal factor, int idEmpresa)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
             CnBD con = new CnBD();
@@ -276,7 +372,7 @@ namespace Datos
             cmd.Parameters.Add(p4);
             System.Data.SqlClient.SqlParameter p5 = new SqlParameter("@desde", System.Data.SqlDbType.Date);
             p5.Value = desde;
-            cmd.Parameters.Add(p5);            
+            cmd.Parameters.Add(p5);
             System.Data.SqlClient.SqlParameter p9 = new SqlParameter("@hasta", System.Data.SqlDbType.Date);
             p9.Value = hasta;
             cmd.Parameters.Add(p9);
@@ -308,7 +404,7 @@ namespace Datos
             return true;
         }
 
-        public bool AgregarPeriodoAguinaldo(int nperiodo, int ubicacion, int mesSemana, DateTime desde, DateTime hasta, int tperiodo, string user, int tipoPlanilla,decimal factor, int idEmpresa)
+        public bool AgregarPeriodoAguinaldo(int nperiodo, int ubicacion, int mesSemana, DateTime desde, DateTime hasta, int tperiodo, string user, int tipoPlanilla, decimal factor, int idEmpresa)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
             CnBD con = new CnBD();
@@ -359,8 +455,7 @@ namespace Datos
             }
             return true;
         }
-        //AGREGADOS POR WBRAVO
-        //Dato_Periodo
+       
         public dsPlanilla.dtPeriodoDataTable Sel(int periodo, int idEmpresa)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
@@ -390,7 +485,7 @@ namespace Datos
 
             return dt;
         }
-        public dsPlanilla.dtPeriodoDataTable SeleccionarPeriodoCat(int tperiodo, int tplanilla,int ubicacion, int idEmpresa)
+        public dsPlanilla.dtPeriodoDataTable SeleccionarPeriodoCat(int tperiodo, int tplanilla, int ubicacion, int idEmpresa)
         {
             SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
             System.Data.SqlClient.SqlCommand cmd = new SqlCommand();
@@ -489,6 +584,30 @@ namespace Datos
             SqlCommand cmd = new SqlCommand();
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.CommandText = "PlnPeriodoFiscalSel_Mod2025";
+            cmd.Connection = sqlConnection;
+            SqlDataAdapter da = new SqlDataAdapter(cmd);
+            DataTable dt = new DataTable();
+            try
+            {
+                da.Fill(dt);
+            }
+            catch (SystemException)
+            {
+                if (cmd.Connection.State != 0)
+                {
+                    cmd.Connection.Close();
+                }
+                return dt;
+            }
+            return dt;
+        }
+
+        public DataTable GetAllPeriodosFiscal(int idEmpresa)
+        {
+            SqlConnection sqlConnection = ConnectionRepository.getConnection(idEmpresa);
+            SqlCommand cmd = new SqlCommand();
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.CommandText = "GetAllPeriodoFiscal";
             cmd.Connection = sqlConnection;
             SqlDataAdapter da = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();

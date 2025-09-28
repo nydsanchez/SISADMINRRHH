@@ -1,0 +1,65 @@
+﻿.relleno{
+    margin-top:60px;
+    width: auto;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.box {
+    width: 60%;
+    height: auto;
+    margin: 25px auto;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-wrap:wrap;
+    justify-content: space-around;
+    align-items: center;
+    border-radius:6px;
+}
+
+.panel_body__Flex {
+    display: flex;
+}
+
+.text_form {
+    width: 175px;
+    height: 35px;
+    border-radius: 3px;
+}
+
+.title{
+    font-size:28px;
+    font-weight:bolder;
+    text-align:center;
+}
+.subtitle{
+    width: 100%;
+   
+}
+.heading2{
+ font-weight: bold;
+ font-size: 18px;
+}
+
+#imgPopup {
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+}
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap:30px;
+}
+
+.center_v2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+align_right {
+    margin-left: auto;
+}
