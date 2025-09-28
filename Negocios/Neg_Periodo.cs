@@ -118,6 +118,8 @@ namespace Negocios
 			return x.PlnPeriodoFiscalSelMod(userDetail.getIDEmpresa());
 		}
 
+		
+
 		public DataTable GetPeriodoActual()
 		{
 			Dato_Periodo Dato_Periodo = new Dato_Periodo();

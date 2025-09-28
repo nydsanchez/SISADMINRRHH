@@ -70,13 +70,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <%--<div class="col-md-2">
-                                    <asp:Button ID="btnTipoPlanilla" Class="btn btn-success" Style="margin-top: 22px;" runat="server" Text="Aceptar" OnClick="btnTipoPlanilla_Click" />
-                                </div>--%>
-                            </div>
-                        </div>
-                    <%--</asp:View>
-                    <asp:View ID="VWPeriodoCatorcenal" runat="server">--%>
+
             <div class="row" id="periodSemana1" runat="server" visible="false">
                 
                 <div class="col-md-12">
@@ -145,39 +139,7 @@
                         <asp:Button ID="btnAagregar" Class="btn btn-success" runat="server" Text="Guardar" OnClick="btnAagregar_Click" />
                     </div>
             </asp:View>
-                   <%-- <asp:View ID="VWPeriodoQuincenal" runat="server">
-                        <div class="row" id="periodo">
-                         
-                            <div class="col-md-12" style="margin-top: 45px; margin-left: 200px;">
-                                <div class="col-md-2">
-                                    <label class="control-label" for="focusedInput">Mes</label>
-                                    <asp:DropDownList class="form-control" ID="ddlMesPerid" runat="server">
-                                    </asp:DropDownList>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="control-label" for="focusedInput">Desde</label>
-                                    <div class="input-group input-append date" id="datePicker4">
-                                        <asp:TextBox ID="txtFechaDesdPeriQ" class="form-control datepicker"
-                                            runat="server"></asp:TextBox>
-                                        <span class="input-group-addon add-on borderCalendar"><span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="control-label" for="focusedInput">Hasta</label>
-                                    <div class="input-group input-append date" id="datePicker5">
-                                        <asp:TextBox ID="txtFechaHastPeriQ" class="form-control datepicker"
-                                            runat="server"></asp:TextBox>
-                                        <span class="input-group-addon add-on borderCalendar"><span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <asp:Button ID="btnGuardarPQ" Class="btn btn-success" Style="margin-top: 27px;" runat="server" Text="Guardar" OnClick="btnGuardarPQ_Click" />
-                                </div>
-                            </div>
-                        </div>
-                    </asp:View>--%>
+                   
             <asp:View ID="vwPeriodoVacaciones" runat="server">
                 <div class="row">
                     <div class="col-md-12" style="margin-left: 100px;">

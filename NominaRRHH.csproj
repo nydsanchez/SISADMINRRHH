@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>NominaRRHH</RootNamespace>
     <AssemblyName>NominaRRHH</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <UseIISExpress>true</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
@@ -402,6 +402,7 @@
     <Content Include="Images\accent.png" />
     <Content Include="Images\agregar.png" />
     <Content Include="Images\bullet.png" />
+    <Content Include="Images\calendar.gif" />
     <Content Include="Images\first.png" />
     <Content Include="Images\glyphicons-halflings-white.png" />
     <Content Include="Images\glyphicons-halflings.png" />
@@ -2172,6 +2173,7 @@
     <Content Include="Presentacion\AprobacionHExtras.aspx" />
     <Content Include="Presentacion\ComprobanteViatico.aspx" />
     <Content Include="Presentacion\IngresosyDeduccionesIncentivo.aspx" />
+    <Content Include="Presentacion\PeriodoFiscal2.aspx" />
     <Content Include="Presentacion\PersonalIncFueraLayout.aspx" />
     <Content Include="Presentacion\PlanillaIncentivosxDiaRev.aspx" />
     <Content Include="Presentacion\ReporteEficienciaAPI.aspx" />
@@ -3643,6 +3645,7 @@
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <None Include="Scripts\_references.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Styles\periodoFiscal.css" />
     <Content Include="ViewSwitcher.ascx" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -3871,6 +3874,13 @@
     </Compile>
     <Compile Include="Presentacion\IngresosyDeduccionesIncentivo.aspx.designer.cs">
       <DependentUpon>IngresosyDeduccionesIncentivo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Presentacion\PeriodoFiscal2.aspx.cs">
+      <DependentUpon>PeriodoFiscal2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Presentacion\PeriodoFiscal2.aspx.designer.cs">
+      <DependentUpon>PeriodoFiscal2.aspx</DependentUpon>
     </Compile>
     <Compile Include="Presentacion\PersonalIncFueraLayout.aspx.cs">
       <DependentUpon>PersonalIncFueraLayout.aspx</DependentUpon>
