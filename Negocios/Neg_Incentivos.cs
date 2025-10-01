@@ -993,7 +993,7 @@ namespace Negocios
                         emp.Produccion = produccion;
                         emp.Proceso = proceso;
                         emp.Meta = meta;
-         //prueba apara quitar el incentivo para if
+        
                     if (EO.Operacion.Trim().ToUpper() == "IF")
                            {
                             emp.Incentivo = IncentivoConAQL((incentivo / 5) * totaldiasTrab, modulo);
@@ -3486,7 +3486,7 @@ namespace Negocios
             dtOQLMod.Columns.Add("modulo", typeof(string));
             dtOQLMod.Columns.Add("oql", typeof(decimal));
             dtOQLMod.Columns.Add("monto", typeof(decimal));
-            //dtOQLMod.Columns.Add("eficiencia", typeof(decimal));
+            dtOQLMod.Columns.Add("eficiencia", typeof(decimal));
             DataTable eficienciaMod = Session["eficienciaMod"] as DataTable;
             DataTable lo = Session["tablaOQL"] as DataTable;
             DataRow[] modulosprod = null;
@@ -3556,7 +3556,8 @@ namespace Negocios
                     // OQL. Aqui se llena la tabla que se usa para pago en los calculos
                     if (rangooql != null && rangooql.Length != 0)
                     {
-                        monto = rangooql.Select((DataRow c) => c.Field<decimal>("monto")).First();
+                        //monto = rangooql.Select((DataRow c) => c.Field<decimal>("monto")).First(); //PAGA OQL A INSPECTOR FINAL
+                        monto = 0; // NO PAGA INCENTIVO OQL
                     }
                     dtOQLMod.Rows.Add(periodo, modulo, oql, monto);
                 }
@@ -4279,11 +4280,12 @@ namespace Negocios
                         dzpt = Math.Round(diaprodxconst.Sum((DataRow r) => r.Field<decimal>("docenaspagar")), 2);//lo aprobado
                         dzpgprot = Math.Round(diaprodxconst.Sum((DataRow r) => r.Field<decimal>("docenaspagarprot")), 2);//lo aprobado mas lo protegido
                         montodz = Math.Round(diaprodxconst.Sum((DataRow r) => r.Field<decimal>("montodocenas")), 2);//lo aprobado protegido en dinero
-
-                        if (operacion.Trim().ToLower() == "if")
+    
+                        // SE COMENTO PARA QUE DE PAGARA IGUAL QUE LOS OPERARIOS Y NO SE INCLUYE OQL 
+                       /*if (operacion.Trim().ToLower() == "if")
                         {
                             montodz *= 0.5m;
-                        }
+                        }*/
 
                         DataRow[] empSimultaneo = empxdia.Where((DataRow c) => c.Field<int>("codigo_empleado") == codigo && c.Field<bool>("opera_simultaneo")).ToArray();
                         porcentaje_opera = (from x in empDiaMod
@@ -4379,10 +4381,11 @@ namespace Negocios
                             dzprotsec_cut = Math.Round(Convert.ToDecimal(cut["docenasprotxsec"]), 2);
                             montodocenas = Math.Round(Convert.ToDecimal(cut["montodocenas"]), 2);
 
-                            if (operacion.Trim().ToLower() == "if")
+                            // SE COMENTO PARA QUE SE PAGARA IGUAL QUE LOS OPERARIOS Y NO SE INCLUYE OQL
+                            /*if (operacion.Trim().ToLower() == "if")
                             {
                                 montodocenas *= 0.5m;
-                            }
+                            }*/
 
                             if (conteo_operacion > layout && layout > 0m)
                             {
@@ -4554,10 +4557,7 @@ namespace Negocios
                                       select c).ToArray();
                 string[] moduloIncidencia = incidenciascalidad.Select((DataRow c) => c.Field<string>("modulo")).Distinct().ToArray();
                 moduloBonoC = moduloCumplimientoS.Except(moduloIncidencia).ToArray();
-                //ModProtegercalidad = (from c in CalidadMod.AsEnumerable()
-                //                      where moduloCumplimientoS.Contains(c.Field<string>("modulo")) && c.Field<decimal>("TotalIncidencia") == 1m
-                //                      select c).ToArray();
-                //string[] moduloFaltaPermitida = ModProtegercalidad.Select((DataRow c) => c.Field<string>("modulo")).Distinct().ToArray();
+           
                 if (moduloBonoC.Length != 0)
                 {
                     moduloparcial = (from c in datoempR
@@ -4567,17 +4567,7 @@ namespace Negocios
                     {
                         porcentajebonoOp = 0.5m;
                     }
-                    //moduloProtegerBonoC = (from c in datoempR
-                    //                       where moduloFaltaPermitida.Contains(c.Field<string>("modulo"))
-                    //                       select c.Field<string>("modulo")).Distinct().ToArray();
-                    //if (moduloProtegerBonoC.Length == 1)
-                    //{
-                    //    porcentajebonoMod = 0.5m;
-                    //}
-                    //else if (moduloProtegerBonoC.Length > 1)
-                    //{
-                    //    porcentajebonoMod = default(decimal);
-                    //}
+
                     diasmodulo = (decimal)(from c in datoempR
                                            where moduloBonoC.Contains(c.Field<string>("modulo")) && c.Field<bool>("opera_simultaneo")
                                            group c by c.Field<DateTime>("fecha") into c
@@ -4907,7 +4897,9 @@ namespace Negocios
                                 }
                             }
                         }
-                        if (operacion.Trim().ToUpper() == "IF")
+
+                        // SE PODRIA COMENTAR ESTA SECCION DEL IF
+                       if (operacion.Trim().ToUpper() == "IF")
                         {
                             //oqlmod
                             //int Veces = 0;
