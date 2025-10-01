@@ -134,51 +134,7 @@ namespace NominaRRHH.Presentacion
             }
         }
 
-        //public DataTable CargarExcel()
-        //{
-        //    ContentPlaceHolder cph = (ContentPlaceHolder)Master.FindControl("MainContent");
-        //    FileUpload fileUpload = (FileUpload)cph.FindControl("file");
-        //    DataTable dtExcelRecords = new DataTable();
-
-        //    if (fileUpload.HasFile)
-        //    {
-        //        string connectionString = "";
-        //        string fileName = Path.GetFileName(fileUpload.PostedFile.FileName);
-        //        string fileExtension = Path.GetExtension(fileUpload.PostedFile.FileName);
-        //        string fileLocation = HttpContext.Current.Server.MapPath("..").ToString() + @"\Trash\" + fileName;
-        //        fileUpload.SaveAs(fileLocation);
-        //        //  int totalcajas = 0;
-        //        //Check whether file extension is xls or xslx
-        //        if (fileExtension == ".xls")
-        //        {
-        //            connectionString = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=" + fileLocation + ";Extended Properties=\"Excel 8.0;HDR=Yes;IMEX=2\"";
-        //        }
-        //        else if (fileExtension == ".xlsx")
-        //        {
-        //            connectionString = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source=" + fileLocation + ";Extended Properties=\"Excel 12.0;HDR=Yes;IMEX=2\"";
-        //        }
-
-        //        //Create OleDB Connection and OleDb Command
-        //        OleDbConnection con = new OleDbConnection(connectionString);
-        //        OleDbCommand cmd = new OleDbCommand();
-        //        cmd.CommandType = System.Data.CommandType.Text;
-        //        cmd.Connection = con;
-
-        //        OleDbDataAdapter dAdapter = new OleDbDataAdapter(cmd);
-
-        //        con.Open();
-        //        DataTable dtExcelSheetName = con.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-
-        //        string getExcelSheetName = dtExcelSheetName.Rows[0]["Table_Name"].ToString();
-        //        cmd.CommandText = "SELECT * FROM [" + getExcelSheetName + "]";
-        //        dAdapter.SelectCommand = cmd;
-        //        dAdapter.Fill(dtExcelRecords);
-        //        con.Close();
-
-        //    }
-
-        //    return dtExcelRecords;
-        //}
+        
 
         public void CargarDll()
         {

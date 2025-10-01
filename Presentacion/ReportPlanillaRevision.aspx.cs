@@ -43,24 +43,9 @@ namespace NominaRRHH.Presentacion
             if (rbllistImpresion.SelectedValue == "1")
             {
                 Session["Filtro"] = "MODULO";
-
-
                 pnlModulo.Visible = true;
                 pnlCodigo.Visible = false;
-                //if (ddltipor.SelectedValue == "1")
-                //{
-                //    ddlProceso.DataTextField = "ModuloNombre";
-                //    ddlProceso.DataValueField = "MODULO";
-                //    ddlProceso.DataSource = CargarDll();
-                //}
-                //if (ddltipor.SelectedValue == "2")
-                //{
-                //    ddlProceso.DataTextField = "ModuloNombre";
-                //    ddlProceso.DataValueField = "MODULO";
-                //    ddlProceso.DataSource = cargardllMSI();
-                //}
-
-                //ddlProceso.DataBind();
+       
             }
             else if (rbllistImpresion.SelectedValue == "2")
             {
@@ -111,10 +96,6 @@ namespace NominaRRHH.Presentacion
             dsInc.Columns.Add("Deduccion_Detalle", typeof(string));
             dsInc.Columns.Add("DeduccionTotal", typeof(decimal));
             dsInc.Columns.Add("IncenttivoProteccion", typeof(decimal));
-
-
-
-
 
             Session["dtInc"] = dsInc;
             if (txtperiodo.Text != "")
