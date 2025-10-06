@@ -3300,7 +3300,7 @@ namespace Negocios
             decimal docenasprodAdic = default(decimal);
             decimal docenasprodCump = default(decimal);
             decimal docenasPermitidas = default(decimal);
-            decimal dias = 0;
+            decimal dias = 0m;
             DataRow[] datoModR = null;
             DataRow[] semanaProd = null;
             DataRow[] datoModPend = null;
@@ -3315,7 +3315,7 @@ namespace Negocios
             int incidencia_externaC = 0;
             DataRow[] calidadseccion = null;
             DataTable config = Session["tablaConfig"] as DataTable;
-            dias = ((config.Rows.Count <= 0) ? 5 : Convert.ToInt32(config.Rows[0]["diasPagar"]));
+            dias = ((config.Rows.Count <= 0) ? 5 : Convert.ToDecimal(config.Rows[0]["diasPagar"]));
             try//wb3
             {
                 DataTable pend = PlnObtenerProdPendienteByPeriodo(fechaini, fechafin, corteaprobacion, periodo);//Pendiente de aprobacion
