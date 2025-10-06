@@ -4681,7 +4681,7 @@ namespace Negocios
             decimal diasperiodo = default(decimal);
             decimal valor = default(decimal);
             decimal cantidad = default(decimal);
-            decimal dias = 0;
+            decimal dias = 0m;
             int amonestaciones = 0;
             DataTable config = new DataTable();
             string user = Convert.ToString(Page.Session["usuario"]);
@@ -4689,7 +4689,7 @@ namespace Negocios
             try
             {
                 config = Session["tablaConfig"] as DataTable;
-                dias = ((config.Rows.Count <= 0) ? 5 : Convert.ToInt32(config.Rows[0]["diasPagar"])); //convert.Decimal
+                dias = ((config.Rows.Count <= 0) ? 5 : Convert.ToDecimal(config.Rows[0]["diasPagar"])); //convert.Decimal
                 DataTable lt = Session["HORASSEMANA"] as DataTable;
                 DataTable incdiario = Session["INCENTIVOSDIARIO"] as DataTable;
                 DataTable dtmod = Session["produccionPeriodo"] as DataTable;
